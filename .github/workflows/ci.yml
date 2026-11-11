@@ -20,3 +20,8 @@ jobs:
         run: |
           python -m phidiscovery run examples/geology-pilot.json --out geology-out
           python -m phidiscovery spectra examples/demo-spectra.mgf --library examples/demo-reference-spectra.json --out pilot-out/spectra-results.json
+
+      - name: Exercise offline MassBank reference import
+        run: |
+          python -m phidiscovery massbank-import tests/fixtures/synthetic-massbank.txt --out pilot-out/massbank-reference.json
+          test -s pilot-out/massbank-reference.json

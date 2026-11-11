@@ -22,6 +22,17 @@ Build the general research engine before specializing it. Domain-specific analys
 
 **Not yet implemented:** full validated raw LC-MS/MS workflows (mzML/mzXML processing), GNPS/MassBank retrieval, validated spectral library identification with calibrated error models, molecular formula inference, real sample-to-candidate discovery, AI model agents, automation of scientific literature review, docking, biosynthetic predictions, PhiStream integration, or formal external expert confirmation. These require validated reference data, appropriate error models, benchmarks, and explicit human review.
 
+## v0.2: local MassBank reference import (Pilot One preparation)
+
+ΦDiscovery can now parse licensed, locally supplied MassBank MS2 text records into a traceable spectral library using `massbank-import`. The original record accession, license, precursor/adduct, polarity, and SHA-256 digest are retained. Comparing the resulting library to experimental MGF data now filters conflicting polarity/adduct declarations and marks missing metadata as `metadata_incomplete`.
+
+This is **an ingestion and evidence-triage capability, not a scientific identification or newly discovered cannabinoid**. No live external sample dataset is bundled or analyzed by CI. See [MassBank Pilot v0.2](docs/MASSBANK_PILOT_R02.md) for exact commands, licensing, experimental safeguards, and acceptance criteria.
+
+```bash
+python -m phidiscovery massbank-import tests/fixtures/synthetic-massbank.txt --out out/massbank-test-library.json
+python -m unittest discover -s tests -v
+```
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
