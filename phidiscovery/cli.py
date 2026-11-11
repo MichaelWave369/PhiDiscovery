@@ -36,8 +36,18 @@ def main(argv: list[str] | None = None) -> int:
     cmd_s.add_argument("--out", type=Path, default=Path("out/spectra-results.json"))
     cmd_s.add_argument("--precursor-ppm", type=float, default=10.0)
     cmd_s.add_argument("--fragment-tol-da", type=float, default=0.03)
+    cmd_mb = commands.add_parser("massbank-import", help="Convert local licensed MassBank MS2 records to a traceable reference library")
+    cmd_mb.add_argument("records", type=Path, nargs="+")
+    cmd_mb.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
+        if args.command == "massbank-import":
+            from .massbank import import_records
+            result = import_records(args.records)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"Imported {len(result['references'])} MassBank reference spectra to {args.out}")
+            return 0
         if args.command == "spectra":
             from .spectra import compare_mgf
             report = compare_mgf(args.mgf, _json(args.library),
