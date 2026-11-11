@@ -1,0 +1,9 @@
+{
+  "description": "ENTIRELY FICTIONAL fragment sets for demonstrating ambiguity. These are NOT THC or CBD experimental reference spectra.",
+  "references": [
+    {"id": "FAKE-ISOMER-A", "label": "Fictional isomer A (not an identified compound)", "precursor_mz": 315.232,
+     "peaks": [[91.055, 40], [123.080, 80], [174.100, 60], [193.123, 20]]},
+    {"id": "FAKE-ISOMER-B", "label": "Fictional isomer B (not an identified compound)", "precursor_mz": 315.232,
+     "peaks": [[91.055, 40], [123.080, 80], [174.100, 60], [193.123, 20]]}
+  ]
+}

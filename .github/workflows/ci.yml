@@ -1,0 +1,22 @@
+name: PhiDiscovery Verification
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run offline tests
+        run: python -m unittest discover -s tests -v
+      - name: Exercise pilot and check deterministic receipt
+        run: |
+          python -m phidiscovery run examples/cannabinoid-pilot.json --out pilot-out
+          python -m phidiscovery check examples/cannabinoid-pilot.json pilot-out/report.json
+      - name: Exercise generic domain and offline spectrum adapter
+        run: |
+          python -m phidiscovery run examples/geology-pilot.json --out geology-out
+          python -m phidiscovery spectra examples/demo-spectra.mgf --library examples/demo-reference-spectra.json --out pilot-out/spectra-results.json

@@ -1,0 +1,128 @@
+# ΦDiscovery Engine
+
+**General-purpose, offline-first, evidence-driven scientific discovery triage.**
+
+Status: **v0.1.0 research prototype, not an autonomous scientist or validated analytical instrument.** The cannabinoid dataset included in this repository is **entirely synthetic teaching data**. No cannabinoids have been discovered or identified using this prototype. Results are preliminary machine-generated *hypothesis triage*, never proof of identity, novelty, biological effect, or safety.
+
+## Philosophy
+
+Build the general research engine before specializing it. Domain-specific analysis belongs in optional rules, not the core pipeline. Every supported claim must be traceable to its origin; independence, contradictions, data integrity, and uncertainty must be visible. We keep a skeptical agent in every run.
+
+## Capabilities in v0.1.0
+
+1. **Input contract:** JSON evidence bundles containing hypotheses, findings, declared source independence, data modalities and (optionally) local raw-data hashes.
+2. **Deterministic analysis:** validate, sort, compute evidence admissibility, and assign non-affirmative review stages.
+3. **Cross-source audit:** trace distinct sources and independence groups. Source duplication doesn't become corroboration.
+4. **Skeptical checks:** contradictory evidence, unsupported precursor-mass identifications, mass accuracy/tolerance mismatch, synthetic fixture exclusion, and cannabinoid mass ambiguity.
+5. **Reproducibility:** JSON receipt with input SHA-256, per-record analysis, and a `check` command to recompute it. Optional local artifact SHA-256 checks.
+6. **Accessible reporting:** self-contained HTML dashboard, no server required.
+7. **Local spectral adapter:** parse MGF spectra and compare to declared JSON reference peaks by precursor m/z, fragment tolerance, and baseline cosine similarity. Distinguish tentative matches, ambiguous matches, and unassigned features. All example spectra/reference fragments are fictional. A spectral match is not molecular identification.
+8. **Optional reference enrichment:** read-only PubChem PUG REST lookups via a separate explicit command. Never invoked during a local run.
+9. **Domain separation:** cannabinoid-specific ambiguity checks are registered in `phidiscovery/domains/` and run only for the cannabinoid domain; `examples/geology-pilot.json` demonstrates that the same core accepts a different scientific domain.
+
+**Not yet implemented:** full validated raw LC-MS/MS workflows (mzML/mzXML processing), GNPS/MassBank retrieval, validated spectral library identification with calibrated error models, molecular formula inference, real sample-to-candidate discovery, AI model agents, automation of scientific literature review, docking, biosynthetic predictions, PhiStream integration, or formal external expert confirmation. These require validated reference data, appropriate error models, benchmarks, and explicit human review.
+
+## Quick start
+
+Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
+
+```bash
+python -m unittest discover -s tests -v
+python -m phidiscovery validate examples/cannabinoid-pilot.json
+python -m phidiscovery run examples/cannabinoid-pilot.json --out out
+python -m phidiscovery check examples/cannabinoid-pilot.json out/report.json
+python -m phidiscovery spectra examples/demo-spectra.mgf --library examples/demo-reference-spectra.json --out out/spectra-results.json
+```
+
+Open `out/report.html` in any modern browser. For Windows PowerShell, commands are identical, but you can open the report with `start out/report.html`.
+
+To install the CLI command in your own Python environment:
+
+```bash
+python -m pip install -e .
+phi-discovery run examples/cannabinoid-pilot.json --out out
+```
+
+Try the **same generic engine** on a different domain:
+
+```bash
+python -m phidiscovery run examples/geology-pilot.json --out geology-out
+```
+
+Optional **internet-enabled, read-only** identity lookup for registered compounds:
+
+```bash
+python -m phidiscovery pubchem cannabidiol --out out/pubchem-cannabidiol.json
+python -m phidiscovery pubchem cannabigerol --out out/pubchem-cannabigerol.json
+```
+
+This command queries PubChem's name/property endpoint, doesn't alter the hypothesis bundle, and doesn't establish that a molecule is present in any sample. PubChem asks clients to stay below five requests per second; this CLI issues only one at a time, with limited retries/backoff on 429/503 responses. For bulk use, build a proper rate-limited batch adapter or use provider-approved bulk downloads.
+
+## Spectrum reader and matching baseline
+
+The optional `spectra` adapter accepts a local MGF file and an explicitly supplied library of experimental reference peaks. In the included examples **both the MGF peaks and the reference fragments are fictional**. The first feature demonstrates ambiguous matching to two identical fictional reference sets; the second demonstrates an unassigned feature, which emphatically does **not** mean a novel substance.
+
+Reference file format:
+
+```json
+{"references": [{"id": "REFERENCE-1", "label": "Reference", "precursor_mz": 315.232, "peaks": [[91.055, 40], [123.08, 80], [174.1, 60]]}]}
+```
+
+Similarity is a simple one-to-one, intensity-weighted cosine baseline with user-settable precursor ppm and absolute fragment tolerances, requiring three fragment matches by default. It does not handle chromatography, complex adducts, collision-energy normalization, in-source fragmentation, FDR calibration, instrument correction, or structural proof. Results are never automatically counted as independent experimental evidence in the general engine. Pin trusted published spectra and assess licensing before using this on real data.
+
+## Bundle contract v1.0
+
+```json
+{
+  "schema_version": "1.0",
+  "project": {"name": "Project label", "domain": "any-domain"},
+  "candidates": [{"id": "C1", "label": "Candidate name", "hypothesis": "What is being tested?"}],
+  "evidence": [{
+    "id": "E1", "candidate_id": "C1", "kind": "ms2", "relation": "supports",
+    "statement": "What was observed?",
+    "source": {
+      "type": "instrument", "locator": "lab-record:123", "independence_group": "lab-a",
+      "artifact_path": "artifacts/raw.txt", "artifact_sha256": "64 lowercase hex characters"
+    }
+  }]
+}
+```
+
+`artifact_path` and `artifact_sha256` are optional **together**. If supplied, the path must resolve within the directory containing the input JSON and the file must be 100 MiB or smaller. `verified_bytes` proves file bytes match the supplied hash, **not** that the measurement or interpretation is correct. Remote data source locators are labels, not silently fetched or validated. Source group independence is **self-declared** and needs human checking.
+
+For an optional MS1 measurement, use:
+
+```json
+"kind": "ms1",
+"measurement": {"observed_mz": 315.2321, "expected_mz": 315.232, "tolerance_ppm": 5}
+```
+
+This performs one simple precursor accuracy check only. It cannot determine compound identity, distinguish isomers, or replace LC-MS/MS and NMR. All supplied fixture values are invented for UI/integration testing.
+
+## Output classifications
+
+- `insufficient_evidence`: nothing traceable and eligible to support this candidate, or synthetic-only records.
+- `early_signal`: some non-synthetic evidence, but insufficient independent and complementary support.
+- `contested`: non-synthetic contradictory evidence exists; expert adjudication required.
+- `candidate_for_expert_review`: at least two independently grouped evidence sources and at least one MS2/NMR/X-ray modality; **not confirmation**.
+
+Even `candidate_for_expert_review` is a computational triage stage, not a standard chemical confidence level and not a validated novelty claim. Neither presence in cannabis nor any medical benefit is inferred automatically.
+
+## Next-stage pilot criteria
+
+**Pilot 1: real-data read-only evaluation.** Pin a public study accession plus license, retrieve raw data and documented reference spectra, parse standardized mzML/mzXML/MGF, use validated ppm/fragment similarity scoring, and benchmark against known controls. Keep blind holdouts. Compare against published identifications and alternate isomers; route ambiguous hits to professional reviewers.
+
+**Pilot 2: multi-agent integration.** Add bounded worker interfaces for Literature, Spectral Matching, Biosynthetic Context, Alternative Hypothesis, and Independent Auditor. Keep deterministic checks as hard gates that agents cannot override. Use PhiStream only as an optional inference backend; do not bake inference code into this package.
+
+**Pilot 3: scientific validation.** Collaborate with laboratory scientists for appropriate structure elucidation, including MS/MS and NMR where needed; investigate source provenance, reproducibility, contamination and analytical artifacts. Do not publicly label a substance a 'new cannabinoid' without validation.
+
+## Safety, privacy and integrity
+
+- The prototype operates on research metadata and public molecular information; it is **not** a guide for chemical synthesis or drug production.
+- Core analysis is offline, no telemetry, no model downloads, no API keys or hidden automatic requests.
+- The included pilot is synthetic, labeled as such in CLI output and HTML.
+- HTML report escapes user text. Local artifact checks reject path traversal and hash mismatches.
+- Future adapters must enforce licenses, personal-data minimization, sensible rate limits, and source-specific access controls.
+- Source independence, genuine experimental replication, and biological safety require expert judgment.
+
+License: MIT. Developed for the PHI369 Labs ecosystem. Inspired by the general idea of evidence-driven multi-agent research, without copying third-party implementations.

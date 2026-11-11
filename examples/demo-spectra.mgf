@@ -1,0 +1,18 @@
+# SYNTHETIC / FABRICATED EDUCATIONAL DATA: no instrument measurements
+BEGIN IONS
+TITLE=Fictional ambiguous precursor 315, not a real measurement
+PEPMASS=315.2321
+CHARGE=1+
+91.055 40
+123.080 80
+174.100 60
+193.123 20
+END IONS
+BEGIN IONS
+TITLE=Fictional unknown peak, NOT a claimed new compound
+PEPMASS=401.1234
+CHARGE=1+
+111.111 20
+222.222 40
+333.333 60
+END IONS

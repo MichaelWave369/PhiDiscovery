@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phidiscovery"
+version = "0.1.0"
+description = "Offline-first, auditable, domain-independent scientific discovery triage"
+requires-python = ">=3.10"
+dependencies = []
+license = "MIT"
+authors = [{name = "PHI369 Labs"}]
+
+[project.scripts]
+phi-discovery = "phidiscovery.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["phidiscovery*"]
