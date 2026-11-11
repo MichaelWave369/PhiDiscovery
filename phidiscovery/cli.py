@@ -1,0 +1,90 @@
+"""PhiDiscovery command line. Offline by default."""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+from .engine import InputError, analyze, validate_bundle, verify_report
+from .report import save_report
+
+
+def _json(path: Path) -> dict:
+    if path.stat().st_size > 20 * 1024 * 1024:
+        raise InputError("Input JSON exceeds protective 20 MiB cap")
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="phi-discovery", description="Evidence-first scientific discovery triage")
+    commands = parser.add_subparsers(dest="command", required=True)
+    cmd_v = commands.add_parser("validate", help="Validate a research evidence bundle")
+    cmd_v.add_argument("input", type=Path)
+    cmd_r = commands.add_parser("run", help="Analyze bundle and emit JSON + standalone HTML")
+    cmd_r.add_argument("input", type=Path)
+    cmd_r.add_argument("--out", type=Path, default=Path("out"))
+    cmd_c = commands.add_parser("check", help="Recompute/verify a report using original input + artifacts")
+    cmd_c.add_argument("input", type=Path)
+    cmd_c.add_argument("report", type=Path)
+    cmd_p = commands.add_parser("pubchem", help="Opt-in read-only PubChem identity lookup; network required")
+    cmd_p.add_argument("name")
+    cmd_p.add_argument("--out", type=Path)
+    cmd_s = commands.add_parser("spectra", help="Compare local MGF peak lists with a JSON reference library")
+    cmd_s.add_argument("mgf", type=Path)
+    cmd_s.add_argument("--library", type=Path, required=True)
+    cmd_s.add_argument("--out", type=Path, default=Path("out/spectra-results.json"))
+    cmd_s.add_argument("--precursor-ppm", type=float, default=10.0)
+    cmd_s.add_argument("--fragment-tol-da", type=float, default=0.03)
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "spectra":
+            from .spectra import compare_mgf
+            report = compare_mgf(args.mgf, _json(args.library),
+                                 precursor_ppm=args.precursor_ppm,
+                                 fragment_tol_da=args.fragment_tol_da)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"Saved {args.out}")
+            for r in report["results"]:
+                print(f"  {r['spectrum_id']}: {r['stage']} ({len(r['matches'])} reference matches)")
+            return 0
+        if args.command == "pubchem":
+            from .pubchem import lookup
+            result = lookup(args.name)
+            result_text = json.dumps(result, indent=2, ensure_ascii=False) + "\n"
+            if args.out:
+                args.out.parent.mkdir(parents=True, exist_ok=True)
+                args.out.write_text(result_text, encoding="utf-8")
+                print(f"Saved {args.out}")
+            else:
+                print(result_text)
+            return 0
+        bundle = _json(args.input)
+        validate_bundle(bundle)
+        if args.command == "validate":
+            print(f"PASS: {len(bundle['candidates'])} candidates, {len(bundle['evidence'])} evidence records")
+            return 0
+        if args.command == "check":
+            report = _json(args.report)
+            if verify_report(report, bundle, args.input.parent):
+                print("PASS: report matches re-analysis of input and local artifacts")
+                return 0
+            print("FAIL: report differs from re-analysis", file=sys.stderr)
+            return 2
+        report = analyze(bundle, root=args.input.parent)
+        args.out.mkdir(parents=True, exist_ok=True)
+        result_path = args.out / "report.json"
+        result_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        save_report(report, args.out / "report.html")
+        print(f"Saved {result_path} and {args.out / 'report.html'}")
+        for c in report["results"]:
+            print(f"  {c['id']}: {c['stage']} ({c['eligible_support_count']} eligible support records)")
+        return 0
+    except (OSError, InputError, ValueError, KeyError, RuntimeError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

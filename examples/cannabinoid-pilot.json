@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "Cannabinoid Molecular Atlas — Pilot Zero",
+    "domain": "cannabinoids",
+    "description": "Synthetic offline fixture for validating evidence gates. No real sample was measured."
+  },
+  "candidates": [
+    {
+      "id": "CB-CBD",
+      "label": "Cannabidiol (CBD) reference hypothesis",
+      "hypothesis": "A shared precursor-mass signal might be consistent with CBD, but cannot establish identity.",
+      "reference_mz": 315.232
+    },
+    {
+      "id": "CB-THC",
+      "label": "Delta-9-THC reference hypothesis",
+      "hypothesis": "An isomeric candidate might explain the same precursor signal.",
+      "reference_mz": 315.232
+    },
+    {
+      "id": "CB-UNKNOWN",
+      "label": "Unassigned synthetic signal",
+      "hypothesis": "An unmatched signal would require more evidence before a compound assignment is possible."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "DEMO-MS1-001",
+      "candidate_id": "CB-CBD",
+      "kind": "ms1",
+      "relation": "supports",
+      "statement": "Invented signal in a teaching fixture; expected value is not a measured identification.",
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://cannabinoid-pilot/demo-ms1",
+        "independence_group": "demo-set-1"
+      },
+      "measurement": {"observed_mz": 315.2321, "expected_mz": 315.232, "tolerance_ppm": 5}
+    },
+    {
+      "id": "DEMO-MS1-002",
+      "candidate_id": "CB-THC",
+      "kind": "ms1",
+      "relation": "supports",
+      "statement": "Same fictional precursor used deliberately to show that exact mass cannot distinguish THC from CBD.",
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://cannabinoid-pilot/demo-ms1",
+        "independence_group": "demo-set-1"
+      },
+      "measurement": {"observed_mz": 315.2321, "expected_mz": 315.232, "tolerance_ppm": 5}
+    },
+    {
+      "id": "DEMO-MS1-003",
+      "candidate_id": "CB-UNKNOWN",
+      "kind": "ms1",
+      "relation": "supports",
+      "statement": "An intentionally incorrect candidate match used to test mass-tolerance rejection.",
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://cannabinoid-pilot/demo-unknown",
+        "independence_group": "demo-set-2"
+      },
+      "measurement": {"observed_mz": 318.2601, "expected_mz": 315.232, "tolerance_ppm": 5}
+    },
+    {
+      "id": "DEMO-LITERATURE-004",
+      "candidate_id": "CB-UNKNOWN",
+      "kind": "literature",
+      "relation": "inconclusive",
+      "statement": "Placeholder used to demonstrate a record that cannot support or refute the hypothesis.",
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://cannabinoid-pilot/no-source",
+        "independence_group": "demo-set-2"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "project": {"name": "Geology — Generality Smoke Test", "domain": "geology", "description": "Synthetic data only"},
+  "candidates": [{"id": "GEO-1", "label": "Unconfirmed formation", "hypothesis": "A topographic anomaly requires ground truth."}],
+  "evidence": [{
+    "id": "SYNTH-TOPO-01", "candidate_id": "GEO-1", "kind": "topographic_image", "relation": "supports",
+    "statement": "Fictional observation used only to demonstrate domain independence.",
+    "source": {"type": "synthetic", "locator": "fixture://geology/topo-1", "independence_group": "fictional-survey"}
+  }]
+}
