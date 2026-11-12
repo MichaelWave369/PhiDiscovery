@@ -53,6 +53,12 @@ python -m phidiscovery review-pack examples/assumption-challenge.json --out out/
 
 The Ollama path uses the same local chat protocol as Agentora, but **does not call Agentora or PhiStream directly**. See [Second Map R0.2](docs/SECOND_MAP_REVIEWERS_R02.md) for safe local execution, private output, portable Agentora-style receipts, and limits.
 
+## Second Map R0.3: real Agentora local model transport
+
+ΦDiscovery now supports an optional **real, independently gated local Agentora** reviewer bridge. It uses an explicit `review-agentora` command to dispatch role-isolated question packets through Agentora's new `/api/discovery/review` endpoint (Ollama structured chat, no normal Agentora team/memory/tools). Models can differ by role, but all statements remain unverified and cannot change scientific evidence stages.
+
+Both repositories need their respective R0.3 updates; the default remains entirely offline. See [Second Map Agentora R0.3](docs/SECOND_MAP_AGENTORA_R03.md) for the two-step operator opt-in, local secret, private receipt handling, and exact commands.
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
