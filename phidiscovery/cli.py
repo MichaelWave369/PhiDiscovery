@@ -105,6 +105,11 @@ def main(argv: list[str] | None = None) -> int:
     cmd_ps.add_argument("commitment", type=Path)
     cmd_ps.add_argument("holdout", type=Path)
     cmd_ps.add_argument("--out", type=Path, required=True, help="New private score report outside Git")
+    cmd_rs = commands.add_parser("replicate-score", help="Score complete repeated-trial holdouts with declared leakage audit (offline)")
+    cmd_rs.add_argument("input", type=Path, help="Unchanged v0.5 registered prediction plan")
+    cmd_rs.add_argument("commitment", type=Path)
+    cmd_rs.add_argument("holdout", type=Path, help="R0.6 repeated-trial holdout and exposure audit")
+    cmd_rs.add_argument("--out", type=Path, required=True, help="New private report outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -143,6 +148,18 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "replicate-score":
+            from .replicates import score_replicates
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            output = score_replicates(
+                _json(args.input), _json(args.commitment), _json(args.holdout))
+            save_private_receipt(output, args.out)
+            print(f"Scored {output['counts']['trials']} trials across "
+                  f"{output['counts']['targets']} targets; "
+                  f"leakage status {output['leakage_audit']['status']} "
+                  "(not scientifically validated)")
             return 0
         if args.command in ("predict-register", "predict-check", "predict-score"):
             from .predictions import register, verify_registration, score
