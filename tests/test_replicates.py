@@ -83,7 +83,7 @@ class ReplicateTests(unittest.TestCase):
             lambda h: h["observations"].pop(),
             lambda h: h["observations"][1].__setitem__("target_id", "theta-05"),
             lambda h: h["observations"][1]["replicates"][0].__setitem__("id", "toy05-a"),
-            lambda h: h["observations"][0]["replicates"].pop(),
+            lambda h: h["observations"][0]["replicates"].__setitem__(slice(1, None), []),
             lambda h: h["observations"][0]["replicates"][0].__setitem__("value", math.nan),
             lambda h: h["observations"][0]["replicates"][0].__setitem__("reported_uncertainty", -1),
             lambda h: h["observations"][0].__setitem__("unit", "ms"),
