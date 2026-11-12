@@ -74,6 +74,26 @@ def main(argv: list[str] | None = None) -> int:
     cmd_ra.add_argument("--execute-local", action="store_true")
     cmd_ra.add_argument("--approve-local-inference", action="store_true")
     cmd_ra.add_argument("--out", type=Path, required=True, help="New private receipt outside Git checkout")
+    cmd_dp = commands.add_parser("debate-pack", help="Prepare second-pass packets from complete sealed first-pass receipts (offline)")
+    cmd_dp.add_argument("input", type=Path)
+    cmd_dp.add_argument("first_pass", type=Path)
+    cmd_dp.add_argument("--out", type=Path, required=True, help="New private JSON path outside the Git checkout")
+    cmd_dl = commands.add_parser("debate-local", help="Opt-in local Ollama second-pass reviews, not proof")
+    cmd_dl.add_argument("input", type=Path)
+    cmd_dl.add_argument("first_pass", type=Path)
+    cmd_dl.add_argument("--model", help="Installed local model used for all roles")
+    cmd_dl.add_argument("--model-challenger")
+    cmd_dl.add_argument("--model-alternative")
+    cmd_dl.add_argument("--model-auditor")
+    cmd_dl.add_argument("--port", type=int, default=11434)
+    cmd_dl.add_argument("--execute-local", action="store_true")
+    cmd_dl.add_argument("--approve-local-inference", action="store_true")
+    cmd_dl.add_argument("--out", type=Path, required=True, help="New private JSON path outside the Git checkout")
+    cmd_dv = commands.add_parser("debate-ledger", help="Reconcile two complete rounds into an audit ledger (offline)")
+    cmd_dv.add_argument("input", type=Path)
+    cmd_dv.add_argument("first_pass", type=Path)
+    cmd_dv.add_argument("second_pass", type=Path)
+    cmd_dv.add_argument("--out", type=Path, required=True, help="New private JSON path outside the Git checkout")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -115,6 +135,32 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         bundle = _json(args.input)
         validate_bundle(bundle)
+        if args.command in ("debate-pack", "debate-local", "debate-ledger"):
+            from .debate import debate_packets, execute_debate_local, reconcile_debate
+            from .reviewers import save_private_receipt, validate_private_path
+            if args.command == "debate-local" and not (args.execute_local and args.approve_local_inference):
+                raise InputError("Second-pass inference requires --execute-local and --approve-local-inference")
+            validate_private_path(args.out)
+            initial = _json(args.first_pass)
+            if args.command == "debate-pack":
+                record = debate_packets(bundle, initial, root=args.input.parent)
+                save_private_receipt(record, args.out)
+                print(f"Saved {len(record['packets'])} sealed second-pass prompts (no model called)")
+                return 0
+            if args.command == "debate-local":
+                models = {
+                    "assumption_challenger": args.model_challenger or args.model,
+                    "alternative_builder": args.model_alternative or args.model,
+                    "experiment_auditor": args.model_auditor or args.model,
+                }
+                record = execute_debate_local(bundle, initial, models, port=args.port, root=args.input.parent)
+                save_private_receipt(record, args.out)
+                print(f"Saved {len(record['receipts'])} local second-pass reviews (not scientific evidence)")
+                return 0
+            record = reconcile_debate(bundle, initial, _json(args.second_pass), root=args.input.parent)
+            save_private_receipt(record, args.out)
+            print(f"Saved revision ledger with {record['counts']['events']} events; {record['counts']['stance_changed']} stance changes")
+            return 0
         if args.command == "review-agentora":
             import os
             from .agentora_bridge import execute_agentora
