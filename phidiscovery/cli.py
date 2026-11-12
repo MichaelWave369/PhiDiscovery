@@ -95,7 +95,7 @@ def main(argv: list[str] | None = None) -> int:
             from .challenge import challenge
             plan = challenge(bundle, root=args.input.parent)
             args.out.parent.mkdir(parents=True, exist_ok=True)
-            args.out.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8")
+            args.out.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
             print(f"Saved {args.out} ({plan['counts']['candidates']} candidates, {plan['counts']['open_issues']} open issues)")
             return 0
         if args.command == "validate":
