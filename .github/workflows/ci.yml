@@ -31,3 +31,8 @@ jobs:
           python -m phidiscovery quantum-brain --out pilot-out/brain
           test -s pilot-out/brain/quantum-brain.json
           test -s pilot-out/brain/quantum-brain.html
+
+      - name: Exercise offline Assumption Challenger
+        run: |
+          python -m phidiscovery challenge examples/assumption-challenge.json --out pilot-out/assumptions.json
+          python -c "import json; r=json.load(open('pilot-out/assumptions.json')); assert r['counts']['candidates']==2; assert r['candidates'][0]['evidence_index']['eligible_support_ids']==[]"

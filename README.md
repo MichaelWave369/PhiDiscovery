@@ -2,7 +2,7 @@
 
 **General-purpose, offline-first, evidence-driven scientific discovery triage.**
 
-Status: **v0.1.0 research prototype, not an autonomous scientist or validated analytical instrument.** The cannabinoid dataset included in this repository is **entirely synthetic teaching data**. No cannabinoids have been discovered or identified using this prototype. Results are preliminary machine-generated *hypothesis triage*, never proof of identity, novelty, biological effect, or safety.
+Status: **research prototype, not an autonomous scientist or validated analytical instrument.** The cannabinoid dataset included in this repository is **entirely synthetic teaching data**. No cannabinoids have been discovered or identified using this prototype. Results are preliminary machine-generated *hypothesis triage*, never proof of identity, novelty, biological effect, or safety.
 
 ## Philosophy
 
@@ -32,6 +32,16 @@ This is **an ingestion and evidence-triage capability, not a scientific identifi
 python -m phidiscovery massbank-import tests/fixtures/synthetic-massbank.txt --out out/massbank-test-library.json
 python -m unittest discover -s tests -v
 ```
+
+## Assumption Challenger R0.1 (second-map pilot)
+
+A new offline epistemic audit makes a candidate's assumptions, competing explanations, predeclared discriminating tests, contradictions, and missing evidence visible. It derives current evidence stages from the existing deterministic triage engine rather than substituting model opinions for measurements.
+
+```bash
+python -m phidiscovery challenge examples/assumption-challenge.json --out out/assumptions.json
+```
+
+The demo evidence is **entirely fictional**. This command produces a structured question/review plan only: it **does not run agents, perform experiments, verify scientific laws, or establish discoveries**. See [Assumption Challenger guide](docs/ASSUMPTION_CHALLENGER_R01.md) for the optional candidate metadata contract, review roles and next milestones.
 
 ## Quick start
 
