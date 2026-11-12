@@ -47,6 +47,9 @@ def main(argv: list[str] | None = None) -> int:
     cmd_q.add_argument("--t2-ms", type=float, default=3.0)
     cmd_q.add_argument("--delay-ms", type=float, default=1.0)
     cmd_q.add_argument("--pulse-angle-rad", type=float, default=1.5707963267948966)
+    cmd_a = commands.add_parser("challenge", help="Audit assumptions, alternatives and falsification plans (offline)")
+    cmd_a.add_argument("input", type=Path)
+    cmd_a.add_argument("--out", type=Path, default=Path("out/assumptions.json"))
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -88,6 +91,13 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         bundle = _json(args.input)
         validate_bundle(bundle)
+        if args.command == "challenge":
+            from .challenge import challenge
+            plan = challenge(bundle, root=args.input.parent)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(json.dumps(plan, indent=2, ensure_ascii=False) + "\\n", encoding="utf-8")
+            print(f"Saved {args.out} ({plan['counts']['candidates']} candidates, {plan['counts']['open_issues']} open issues)")
+            return 0
         if args.command == "validate":
             print(f"PASS: {len(bundle['candidates'])} candidates, {len(bundle['evidence'])} evidence records")
             return 0
