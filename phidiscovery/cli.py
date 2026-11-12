@@ -64,6 +64,16 @@ def main(argv: list[str] | None = None) -> int:
     cmd_rc.add_argument("input", type=Path)
     cmd_rc.add_argument("receipts", type=Path)
     cmd_rc.add_argument("--out", type=Path, default=Path("out/reviewer-comparison.json"))
+    cmd_ra = commands.add_parser("review-agentora", help="Explicit opt-in local Agentora blind research reviews")
+    cmd_ra.add_argument("input", type=Path)
+    cmd_ra.add_argument("--model", help="Use the same installed model for all three roles")
+    cmd_ra.add_argument("--model-challenger", help="Override model for assumption challenger")
+    cmd_ra.add_argument("--model-alternative", help="Override model for alternative builder")
+    cmd_ra.add_argument("--model-auditor", help="Override model for experiment auditor")
+    cmd_ra.add_argument("--port", type=int, default=8088)
+    cmd_ra.add_argument("--execute-local", action="store_true")
+    cmd_ra.add_argument("--approve-local-inference", action="store_true")
+    cmd_ra.add_argument("--out", type=Path, required=True, help="New private receipt outside Git checkout")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -105,6 +115,24 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         bundle = _json(args.input)
         validate_bundle(bundle)
+        if args.command == "review-agentora":
+            import os
+            from .agentora_bridge import execute_agentora
+            from .reviewers import save_private_receipt, validate_private_path
+            if not (args.execute_local and args.approve_local_inference):
+                raise InputError("Agentora inference requires --execute-local and --approve-local-inference")
+            role_models = {
+                "assumption_challenger": args.model_challenger or args.model,
+                "alternative_builder": args.model_alternative or args.model,
+                "experiment_auditor": args.model_auditor or args.model,
+            }
+            key = os.environ.get("PHIDISCOVERY_AGENTORA_REVIEW_KEY", "")
+            validate_private_path(args.out)
+            receipts = execute_agentora(bundle, role_models, port=args.port,
+                                       operator_key=key, root=args.input.parent)
+            save_private_receipt(receipts, args.out)
+            print(f"Saved private Agentora receipt with {len(receipts['receipts'])} model reviews; human review required")
+            return 0
         if args.command in ("review-pack", "review-local", "review-compare"):
             from .reviewers import create_packets, execute_local, compare, save_private_receipt, validate_private_path
             if args.command == "review-pack":
