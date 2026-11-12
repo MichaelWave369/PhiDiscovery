@@ -32,11 +32,17 @@ def _text(value: object, label: str, cap: int = 1000) -> str:
 
 
 def _number(value: object, label: str, *, positive=False, nonnegative=False) -> float:
-    if type(value) not in (int, float) or not math.isfinite(value):
+    if type(value) not in (int, float):
         raise InputError(f"{label} must be a finite numeric value (not boolean)")
-    if positive and value <= 0 or nonnegative and value < 0:
+    try:
+        numeric = float(value)
+    except (ValueError, OverflowError) as exc:
+        raise InputError(f"{label} must be a finite numeric value") from exc
+    if not math.isfinite(numeric):
+        raise InputError(f"{label} must be a finite numeric value")
+    if (positive and numeric <= 0) or (nonnegative and numeric < 0):
         raise InputError(f"{label} is outside its allowed range")
-    return float(value)
+    return numeric
 
 
 def _ids(items: list, label: str):
