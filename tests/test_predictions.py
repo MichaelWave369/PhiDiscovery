@@ -133,6 +133,26 @@ class PredictionHoldoutTests(unittest.TestCase):
         with self.assertRaises(InputError):
             register(p)
 
+    def test_mixed_units_and_unhashable_source_type_are_rejected(self):
+        p = plan()
+        p["targets"][1]["unit"] = "ms"
+        with self.assertRaises(InputError):
+            register(p)
+        p = plan()
+        h = heldout()
+        h["source"]["type"] = {"pretend": "instrument"}
+        with self.assertRaises(InputError):
+            score(p, register(p), h)
+
+    def test_declared_uncertainty_exceeding_tolerance_is_flagged(self):
+        p = plan()
+        h = heldout()
+        h["observations"][1]["uncertainty"] = 0.2
+        result = score(p, register(p), h)
+        relevant = next(t for t in result["target_results"] if t["target_id"] == "theta-40")
+        self.assertTrue(relevant["uncertainty_exceeds_tolerance"])
+        self.assertFalse(result["hypothesis_validated"])
+
     def test_user_asserted_instrument_is_not_authenticated(self):
         p, h = plan(), heldout()
         h["source"]["type"] = "instrument"
