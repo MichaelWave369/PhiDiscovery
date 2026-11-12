@@ -41,3 +41,7 @@ jobs:
         run: |
           python -m phidiscovery review-pack examples/assumption-challenge.json --out pilot-out/review-packets.json
           python -c "import json; p=json.load(open('pilot-out/review-packets.json')); assert len(p['packets'])==6"
+
+      - name: Validate offline Agentora bridge contracts (never contacts Agentora)
+        run: |
+          python -m unittest tests.test_agentora_bridge -v
