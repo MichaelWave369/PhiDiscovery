@@ -43,6 +43,16 @@ python -m phidiscovery challenge examples/assumption-challenge.json --out out/as
 
 The demo evidence is **entirely fictional**. This command produces a structured question/review plan only: it **does not run agents, perform experiments, verify scientific laws, or establish discoveries**. See [Assumption Challenger guide](docs/ASSUMPTION_CHALLENGER_R01.md) for the optional candidate metadata contract, review roles and next milestones.
 
+## Second Map R0.2: isolated computational reviewers
+
+Three role-blind reviewer packets can now be generated offline from an Assumption Challenger bundle. Optional **explicitly approved** local Ollama inference and receipt comparison preserve disagreements without upgrading research claims into established facts.
+
+```bash
+python -m phidiscovery review-pack examples/assumption-challenge.json --out out/review-packets.json
+```
+
+The Ollama path uses the same local chat protocol as Agentora, but **does not call Agentora or PhiStream directly**. See [Second Map R0.2](docs/SECOND_MAP_REVIEWERS_R02.md) for safe local execution, private output, portable Agentora-style receipts, and limits.
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:

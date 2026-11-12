@@ -50,6 +50,20 @@ def main(argv: list[str] | None = None) -> int:
     cmd_a = commands.add_parser("challenge", help="Audit assumptions, alternatives and falsification plans (offline)")
     cmd_a.add_argument("input", type=Path)
     cmd_a.add_argument("--out", type=Path, default=Path("out/assumptions.json"))
+    cmd_rp = commands.add_parser("review-pack", help="Export isolated reviewer packets (offline, no model call)")
+    cmd_rp.add_argument("input", type=Path)
+    cmd_rp.add_argument("--out", type=Path, default=Path("out/review-packets.json"))
+    cmd_rl = commands.add_parser("review-local", help="Opt-in, loopback Ollama research reviews; no external network fallback")
+    cmd_rl.add_argument("input", type=Path)
+    cmd_rl.add_argument("--model", required=True)
+    cmd_rl.add_argument("--port", type=int, default=11434)
+    cmd_rl.add_argument("--execute-local", action="store_true")
+    cmd_rl.add_argument("--approve-local-inference", action="store_true")
+    cmd_rl.add_argument("--out", type=Path, required=True, help="New private JSON receipt outside this repository")
+    cmd_rc = commands.add_parser("review-compare", help="Compare role opinions without upgrading evidence (offline)")
+    cmd_rc.add_argument("input", type=Path)
+    cmd_rc.add_argument("receipts", type=Path)
+    cmd_rc.add_argument("--out", type=Path, default=Path("out/reviewer-comparison.json"))
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -91,6 +105,27 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         bundle = _json(args.input)
         validate_bundle(bundle)
+        if args.command in ("review-pack", "review-local", "review-compare"):
+            from .reviewers import create_packets, execute_local, compare, save_private_receipt, validate_private_path
+            if args.command == "review-pack":
+                output = create_packets(bundle, root=args.input.parent)
+                args.out.parent.mkdir(parents=True, exist_ok=True)
+                args.out.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+                print(f"Saved {args.out} ({len(output['packets'])} isolated packets; no model call)")
+                return 0
+            if args.command == "review-local":
+                if not (args.execute_local and args.approve_local_inference):
+                    raise InputError("Local inference requires both --execute-local and --approve-local-inference")
+                validate_private_path(args.out)
+                output = execute_local(bundle, args.model, port=args.port, root=args.input.parent)
+                save_private_receipt(output, args.out)
+                print(f"Saved private model receipt with {len(output['receipts'])} reviews; human review required")
+                return 0
+            output = compare(bundle, _json(args.receipts), root=args.input.parent)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            print(f"Saved {args.out} ({len(output['comparisons'])} candidates; no claims verified)")
+            return 0
         if args.command == "challenge":
             from .challenge import challenge
             plan = challenge(bundle, root=args.input.parent)

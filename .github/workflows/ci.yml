@@ -36,3 +36,8 @@ jobs:
         run: |
           python -m phidiscovery challenge examples/assumption-challenge.json --out pilot-out/assumptions.json
           python -c "import json; r=json.load(open('pilot-out/assumptions.json')); assert r['counts']['candidates']==2; assert r['candidates'][0]['evidence_index']['eligible_support_ids']==[]"
+
+      - name: Export blind reviewer packets without inference
+        run: |
+          python -m phidiscovery review-pack examples/assumption-challenge.json --out pilot-out/review-packets.json
+          python -c "import json; p=json.load(open('pilot-out/review-packets.json')); assert len(p['packets'])==6"
