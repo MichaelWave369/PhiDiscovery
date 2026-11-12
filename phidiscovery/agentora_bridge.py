@@ -42,7 +42,7 @@ def _post_packet(packet: dict, model: str, port: int, key: str) -> dict:
         method="POST",
     )
     try:
-        with urllib.request.build_opener(_NoRedirect).open(req, timeout=120) as reply:
+        with urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect).open(req, timeout=120) as reply:
             body = reply.read(MAX_RESPONSE_BYTES + 1)
     except (OSError, urllib.error.URLError, urllib.error.HTTPError) as exc:
         raise InputError("Local Agentora reviewer unavailable or refused the call") from exc
