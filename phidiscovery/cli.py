@@ -39,8 +39,24 @@ def main(argv: list[str] | None = None) -> int:
     cmd_mb = commands.add_parser("massbank-import", help="Convert local licensed MassBank MS2 records to a traceable reference library")
     cmd_mb.add_argument("records", type=Path, nargs="+")
     cmd_mb.add_argument("--out", type=Path, required=True)
+    cmd_q = commands.add_parser("quantum-brain", help="Generate a synthetic Quantum Brain Lab report (offline)")
+    cmd_q.add_argument("--out", type=Path, default=Path("out/brain"))
+    cmd_q.add_argument("--duration-ms", type=float, default=160.0)
+    cmd_q.add_argument("--step-ms", type=float, default=0.5)
+    cmd_q.add_argument("--stimulus", type=float, default=1.35)
+    cmd_q.add_argument("--t2-ms", type=float, default=3.0)
+    cmd_q.add_argument("--delay-ms", type=float, default=1.0)
+    cmd_q.add_argument("--pulse-angle-rad", type=float, default=1.5707963267948966)
     args = parser.parse_args(argv)
     try:
+        if args.command == "quantum-brain":
+            from .quantum_brain import LabConfig, save_lab
+            config = LabConfig(duration_ms=args.duration_ms, step_ms=args.step_ms,
+                               stimulus=args.stimulus, delay_ms=args.delay_ms,
+                               hypothetical_t2_ms=args.t2_ms, pulse_angle_rad=args.pulse_angle_rad)
+            json_path, html_path = save_lab(config, args.out)
+            print(f"Saved synthetic lab outputs: {json_path} and {html_path}")
+            return 0
         if args.command == "massbank-import":
             from .massbank import import_records
             result = import_records(args.records)

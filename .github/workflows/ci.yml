@@ -25,3 +25,9 @@ jobs:
         run: |
           python -m phidiscovery massbank-import tests/fixtures/synthetic-massbank.txt --out pilot-out/massbank-reference.json
           test -s pilot-out/massbank-reference.json
+
+      - name: Exercise offline quantum brain models
+        run: |
+          python -m phidiscovery quantum-brain --out pilot-out/brain
+          test -s pilot-out/brain/quantum-brain.json
+          test -s pilot-out/brain/quantum-brain.html

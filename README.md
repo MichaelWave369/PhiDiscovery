@@ -137,3 +137,13 @@ Even `candidate_for_expert_review` is a computational triage stage, not a standa
 - Source independence, genuine experimental replication, and biological safety require expert judgment.
 
 License: MIT. Developed for the PHI369 Labs ecosystem. Inspired by the general idea of evidence-driven multi-agent research, without copying third-party implementations.
+
+## Quantum Brain Lab (synthetic research sandbox)
+
+PhiDiscovery now includes an optional offline educational model-comparison lab: a leaky integrate-and-fire neuron, an abstract classical two-state mixture, ideal quantum-inspired interference, and a hypothetical dephasing scenario. **This does not establish that brains perform quantum computation.** The report is self-contained and has interactive what-if controls.
+
+~~~bash
+python -m phidiscovery quantum-brain --out out/brain
+~~~
+
+Open `out/brain/quantum-brain.html` and read [the Quantum Brain Lab guide](docs/QUANTUM_BRAIN_LAB.md) for equations, limitations, and the experimental roadmap.
