@@ -40,9 +40,10 @@ def second_model(packet, model, port):
     assert "own_first_pass" in packet["context"]
     assert len(packet["context"]["peer_first_pass"]) == 2
     # Force one stance revision to exercise transition reporting.
-    changed = packet["role"] == "assumption_challenger"
+    # Challenger softens, alternative builder switches, auditor holds steady.
+    stance = "challenge" if packet["role"] == "alternative_builder" else "unresolved"
     return {
-        "stance": "unresolved" if changed else "challenge",
+        "stance": stance,
         "analysis": "After peer criticism, I would revise the claim while preserving uncertainty.",
         "counterexample": "Independent controlled trials could contradict the toy model.",
         "discriminating_prediction": "A new measured boundary case would discriminate models.",
