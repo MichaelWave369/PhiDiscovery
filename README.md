@@ -65,6 +65,16 @@ A sealed round-two debate now lets each reviewer examine the **other two first-p
 
 See [Second Map Debate R0.4](docs/SECOND_MAP_DEBATE_R04.md) for the full private PowerShell workflow and scientific limits.
 
+## Second Map R0.5: preregistered predictions versus held-out measurements
+
+Debate is not evidence. The new offline `predict-register`, `predict-check`, and `predict-score` commands freeze complete numeric predictions and tolerances into a SHA-256 commitment, then descriptively score all registered models on the exact same held-out targets. The scorer reports MAE, RMSE and tolerance-hit rate without pretending that model votes establish physical laws.
+
+```bash
+python -m unittest tests.test_predictions -v
+```
+
+The included pendulum plan/holdout is **entirely fictional**. A local digest is **not an independently timestamped preregistration**, and user-supplied observations are not automatically authenticated. See [Second Map Prediction Holdout R0.5](docs/SECOND_MAP_PREDICTIONS_R05.md) for a complete private-output PowerShell workflow and limitations.
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:

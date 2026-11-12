@@ -94,6 +94,17 @@ def main(argv: list[str] | None = None) -> int:
     cmd_dv.add_argument("first_pass", type=Path)
     cmd_dv.add_argument("second_pass", type=Path)
     cmd_dv.add_argument("--out", type=Path, required=True, help="New private JSON path outside the Git checkout")
+    cmd_pr = commands.add_parser("predict-register", help="Seal numeric predictions before opening the holdout (offline)")
+    cmd_pr.add_argument("input", type=Path, help="Prediction plan JSON, no observed values")
+    cmd_pr.add_argument("--out", type=Path, required=True, help="New private commitment receipt outside Git")
+    cmd_pc = commands.add_parser("predict-check", help="Check locked predictions against a prior commitment (offline)")
+    cmd_pc.add_argument("input", type=Path)
+    cmd_pc.add_argument("commitment", type=Path)
+    cmd_ps = commands.add_parser("predict-score", help="Score a locked plan against a complete separate holdout (offline)")
+    cmd_ps.add_argument("input", type=Path)
+    cmd_ps.add_argument("commitment", type=Path)
+    cmd_ps.add_argument("holdout", type=Path)
+    cmd_ps.add_argument("--out", type=Path, required=True, help="New private score report outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -132,6 +143,25 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command in ("predict-register", "predict-check", "predict-score"):
+            from .predictions import register, verify_registration, score
+            from .reviewers import save_private_receipt, validate_private_path
+            # Prediction plans are independent from the v1.0 research evidence bundle.
+            plan = _json(args.input)
+            if args.command == "predict-check":
+                verify_registration(plan, _json(args.commitment))
+                print("PASS: prediction plan matches prior commitment bytes")
+                return 0
+            validate_private_path(args.out)
+            if args.command == "predict-register":
+                record = register(plan)
+                save_private_receipt(record, args.out)
+                print(f"Saved commitment {record['plan_sha256']} (chronology not attested)")
+                return 0
+            record = score(plan, _json(args.commitment), _json(args.holdout))
+            save_private_receipt(record, args.out)
+            print(f"Scored {record['counts']['targets']} targets and {record['counts']['models']} models; source unverified")
             return 0
         bundle = _json(args.input)
         validate_bundle(bundle)

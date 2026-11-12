@@ -1,0 +1,48 @@
+{
+  "schema_version": "0.5",
+  "study": {
+    "id": "toy-pendulum-holdout-r05",
+    "question": "Does a constant-period approximation predict the same held-out observations as an amplitude-sensitive alternative?",
+    "measurement_protocol": "FICTIONAL teaching fixture: predeclare fixed-length pendulum periods for three launch angles. In real experiments, control length, gravity, friction and timing error, use blinded repeated trials and independent instruments.",
+    "holdout_id": "fictional-pendulum-a1",
+    "baseline_model_id": "constant"
+  },
+  "models": [
+    {
+      "id": "constant",
+      "label": "Small-angle constant-period approximation",
+      "hypothesis": "The period is nearly constant across the tested range."
+    },
+    {
+      "id": "nonlinear",
+      "label": "Amplitude-dependent alternative",
+      "hypothesis": "The period changes with larger initial angles."
+    }
+  ],
+  "targets": [
+    {
+      "id": "theta-05",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "condition": "FICTIONAL controlled pendulum, 1 m length, 5-degree initial angle",
+      "tolerance": 0.02,
+      "predictions": {"constant": 2.006, "nonlinear": 2.006}
+    },
+    {
+      "id": "theta-40",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "condition": "FICTIONAL controlled pendulum, 1 m length, 40-degree initial angle",
+      "tolerance": 0.02,
+      "predictions": {"constant": 2.006, "nonlinear": 2.069}
+    },
+    {
+      "id": "theta-70",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "condition": "FICTIONAL controlled pendulum, 1 m length, 70-degree initial angle",
+      "tolerance": 0.02,
+      "predictions": {"constant": 2.006, "nonlinear": 2.236}
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "schema_version": "0.5",
+  "study_id": "toy-pendulum-holdout-r05",
+  "holdout_id": "fictional-pendulum-a1",
+  "source": {
+    "type": "synthetic",
+    "locator": "demo:fictional-pendulum-2026-11-12",
+    "independence_group": "fictional-teaching-data"
+  },
+  "observations": [
+    {
+      "target_id": "theta-05",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "value": 2.002,
+      "uncertainty": 0.01
+    },
+    {
+      "target_id": "theta-40",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "value": 2.075,
+      "uncertainty": 0.01
+    },
+    {
+      "target_id": "theta-70",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "value": 2.244,
+      "uncertainty": 0.01
+    }
+  ]
+}
