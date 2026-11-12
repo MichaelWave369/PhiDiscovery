@@ -49,3 +49,11 @@ jobs:
       - name: Exercise sealed debate and revision ledger without model inference
         run: |
           python -m unittest tests.test_debate -v
+
+      - name: Lock and score toy predictions against isolated synthetic holdout (offline)
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/prediction-lock.json"
+          python -m phidiscovery predict-check examples/prediction-plan-r05.json "$TEMP_DIR/prediction-lock.json"
+          python -m phidiscovery predict-score examples/prediction-plan-r05.json "$TEMP_DIR/prediction-lock.json" examples/synthetic-holdout-r05.json --out "$TEMP_DIR/prediction-score.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['synthetic_holdout'] and not r['hypothesis_validated']; assert r['lowest_mae_model_ids_descriptive_only']==['nonlinear']" "$TEMP_DIR/prediction-score.json"
