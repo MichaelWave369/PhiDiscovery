@@ -59,6 +59,12 @@ The Ollama path uses the same local chat protocol as Agentora, but **does not ca
 
 Both repositories need their respective R0.3 updates; the default remains entirely offline. See [Second Map Agentora R0.3](docs/SECOND_MAP_AGENTORA_R03.md) for the two-step operator opt-in, local secret, private receipt handling, and exact commands.
 
+## Second Map R0.4: scientific debate and revision ledger
+
+A sealed round-two debate now lets each reviewer examine the **other two first-pass reviews only after the original three assessments are complete and hash-validated**. The new offline commands `debate-pack` and `debate-ledger`, plus an explicitly approved local Ollama `debate-local` runner, preserve initial and revised positions with linked event hashes. This is model argumentation, **not empirical confirmation**.
+
+See [Second Map Debate R0.4](docs/SECOND_MAP_DEBATE_R04.md) for the full private PowerShell workflow and scientific limits.
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:

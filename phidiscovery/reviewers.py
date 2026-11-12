@@ -171,7 +171,7 @@ def _ollama_chat(packet: dict, model: str, port: int) -> tuple[dict, str]:
         f"http://127.0.0.1:{port}/api/chat", data=data,
         headers={"Content-Type": "application/json"}, method="POST")
     try:
-        with urllib.request.build_opener(_NoRedirect).open(req, timeout=120) as response:
+        with urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect).open(req, timeout=120) as response:
             body = response.read(MAX_BODY_BYTES + 1)
     except (OSError, urllib.error.URLError) as exc:
         raise InputError("Loopback Ollama request failed; no remote fallback") from exc
