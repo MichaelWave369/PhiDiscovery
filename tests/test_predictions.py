@@ -100,6 +100,10 @@ class PredictionHoldoutTests(unittest.TestCase):
         p["targets"][0]["tolerance"] = 0
         with self.assertRaises(InputError):
             register(p)
+        p = plan()
+        p["targets"][0]["predictions"]["constant"] = 10 ** 400
+        with self.assertRaises(InputError):
+            register(p)
 
     def test_invalid_source_and_uncertainty_are_refused(self):
         p, lock = plan(), register(plan())
