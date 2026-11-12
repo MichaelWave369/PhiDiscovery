@@ -112,7 +112,7 @@ def validate_review(review: object, packet: dict) -> dict:
             "test_design", "cited_evidence_ids", "uncertainties"}
     if set(review) != keys:
         raise InputError(f"Reviewer output must contain exactly: {sorted(keys)}")
-    if review["stance"] not in STANCES:
+    if type(review["stance"]) is not str or review["stance"] not in STANCES:
         raise InputError("Reviewer stance invalid")
     output = {"stance": review["stance"]}
     for field in ("analysis", "counterexample", "discriminating_prediction", "test_design"):
@@ -138,8 +138,23 @@ class _NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def _ollama_chat(packet: dict, model: str, port: int) -> tuple[dict, str]:
     """A fixed loopback-only Ollama /api/chat request. No discovery or fallback."""
+    response_schema = {
+        "type": "object",
+        "properties": {
+            "stance": {"type": "string", "enum": sorted(STANCES)},
+            "analysis": {"type": "string"}, "counterexample": {"type": "string"},
+            "discriminating_prediction": {"type": "string"},
+            "test_design": {"type": "string"},
+            "cited_evidence_ids": {"type": "array", "items": {"type": "string"}},
+            "uncertainties": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": ["stance", "analysis", "counterexample",
+                     "discriminating_prediction", "test_design",
+                     "cited_evidence_ids", "uncertainties"],
+        "additionalProperties": False,
+    }
     payload = {
-        "model": model, "stream": False, "format": "json",
+        "model": model, "stream": False, "format": response_schema,
         "options": {"temperature": 0, "num_predict": 768},
         "messages": [
             {"role": "system", "content": packet["system"]},
@@ -220,7 +235,7 @@ def compare(bundle: dict, collected: dict, root=None) -> dict:
     seen = set()
     results = {p["candidate_id"]: [] for p in pack["packets"]}
     for row in rows:
-        if type(row) is not dict or row.get("packet_id") not in expected:
+        if type(row) is not dict or type(row.get("packet_id")) is not str or row["packet_id"] not in expected:
             raise InputError("Unknown reviewer packet receipt")
         pid = row["packet_id"]
         if pid in seen:
@@ -257,8 +272,8 @@ def compare(bundle: dict, collected: dict, root=None) -> dict:
     }
 
 
-def save_private_receipt(receipt: dict, filename: Path) -> None:
-    """Exclusive-create a private receipt outside the repository checkout."""
+def validate_private_path(filename: Path) -> Path:
+    """Preflight the private destination before allocating any model inference."""
     filename = Path(filename).expanduser()
     repo_root = Path(__file__).resolve().parents[1]
     if filename.suffix.lower() != ".json" or filename.is_symlink() or filename.exists():
@@ -272,6 +287,12 @@ def save_private_receipt(receipt: dict, filename: Path) -> None:
     target = parent / filename.name
     if target == repo_root or repo_root in target.parents:
         raise InputError("Local model receipts must be stored outside the repository")
+    return target
+
+
+def save_private_receipt(receipt: dict, filename: Path) -> None:
+    """Exclusive-create a private receipt outside the repository checkout."""
+    target = validate_private_path(filename)
     raw = (json.dumps(receipt, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
     if len(raw) > 2 * 1024 * 1024:
         raise InputError("Receipt exceeds 2 MiB")
