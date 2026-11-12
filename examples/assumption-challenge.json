@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "name": "Toy pendulum: questioning inherited assumptions",
+    "domain": "mechanics"
+  },
+  "candidates": [
+    {
+      "id": "C-1",
+      "label": "Period independent of launch angle at every amplitude",
+      "hypothesis": "Pendulum period is independent of initial angle for all amplitudes.",
+      "assumptions": [
+        "The small-angle approximation remains valid at arbitrarily large angles.",
+        "Length, local gravity, air drag and launch procedure are controlled."
+      ],
+      "alternatives": [
+        "Angle-dependent nonlinear dynamics predict a longer period at larger amplitudes."
+      ],
+      "discriminating_tests": [
+        {
+          "id": "T-1",
+          "measurement": "Measure period for several preregistered initial angles at fixed length and location, with error bars.",
+          "prediction_if_claim": "Periods agree across angles within preregistered uncertainty.",
+          "prediction_if_alternative": "Period changes with angle beyond preregistered uncertainty.",
+          "decision_rule": "Compare a constant-period model against an amplitude-dependent model on withheld trials; publish errors and controls."
+        }
+      ]
+    },
+    {
+      "id": "C-2",
+      "label": "Second example with undeclared assumptions",
+      "hypothesis": "Any two observations must share one causal explanation."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-1",
+      "candidate_id": "C-1",
+      "kind": "demonstration",
+      "relation": "supports",
+      "statement": "FICTIONAL record for input-contract demonstration only.",
+      "source": {
+        "type": "synthetic",
+        "locator": "local-fixture:E-1",
+        "independence_group": "synthetic-demo"
+      }
+    },
+    {
+      "id": "E-2",
+      "candidate_id": "C-1",
+      "kind": "demonstration",
+      "relation": "contradicts",
+      "statement": "FICTIONAL contradictory record, not an experiment.",
+      "source": {
+        "type": "synthetic",
+        "locator": "local-fixture:E-2",
+        "independence_group": "synthetic-demo"
+      }
+    }
+  ]
+}
