@@ -84,6 +84,10 @@ def validate_plan(plan: object) -> None:
         for model_id, value in prediction.items():
             _number(value, f"predictions[{model_id}]")
     _ids(targets, "target")
+    # Raw MAE/RMSE across unrelated physical units is meaningless. R0.5
+    # deliberately supports one measurable quantity and unit per study.
+    if len({(t["quantity"], t["unit"]) for t in targets}) != 1:
+        raise InputError("R0.5 requires all targets to share one measurable quantity and unit")
     # Predictions deliberately contain no observations. A separate holdout
     # document is required; do not add observed values to this contract.
 
@@ -132,7 +136,7 @@ def validate_holdout(plan: dict, holdout: object) -> None:
         raise InputError("Holdout study identifier differs from preregistered study")
     source = holdout["source"]
     _keys(source, {"type", "locator", "independence_group"}, "holdout.source")
-    if source["type"] not in SOURCE_TYPES:
+    if type(source["type"]) is not str or source["type"] not in SOURCE_TYPES:
         raise InputError("Unknown holdout source type")
     for field in ("locator", "independence_group"):
         _text(source[field], f"holdout.source.{field}")
