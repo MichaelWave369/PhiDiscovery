@@ -217,6 +217,7 @@ def reconcile_debate(bundle: dict, initial: dict, second: dict, root=None) -> di
             "candidate_id": cid, "role": role, "phase": "sealed_first_pass",
             "packet_id": original_id, "parent_event_sha256": None,
             "review_sha256": sha256(own), "review": own,
+            "evidence_stage_unchanged": packet["context"]["evidence_stage"],
             "source_category": "unverified_model_opinion",
         }))
         previous = events[-1]["event_sha256"]
@@ -225,6 +226,7 @@ def reconcile_debate(bundle: dict, initial: dict, second: dict, root=None) -> di
             "packet_id": packet["packet_id"],
             "parent_event_sha256": previous,
             "review_sha256": sha256(revised), "review": revised,
+            "evidence_stage_unchanged": packet["context"]["evidence_stage"],
             "source_category": "unverified_model_opinion",
         }))
         previous = events[-1]["event_sha256"]
@@ -236,6 +238,7 @@ def reconcile_debate(bundle: dict, initial: dict, second: dict, root=None) -> di
             "response_text_changed": sha256(own) != sha256(revised),
             "reason_offered_unverified": revised["analysis"],
             "empirical_evidence_added": False,
+            "evidence_stage_unchanged": packet["context"]["evidence_stage"],
         })
     counts = Counter("changed" if row["stance_changed"] else "unchanged" for row in summaries)
     return {
