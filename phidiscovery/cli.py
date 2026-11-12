@@ -106,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
         bundle = _json(args.input)
         validate_bundle(bundle)
         if args.command in ("review-pack", "review-local", "review-compare"):
-            from .reviewers import create_packets, execute_local, compare, save_private_receipt
+            from .reviewers import create_packets, execute_local, compare, save_private_receipt, validate_private_path
             if args.command == "review-pack":
                 output = create_packets(bundle, root=args.input.parent)
                 args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -116,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.command == "review-local":
                 if not (args.execute_local and args.approve_local_inference):
                     raise InputError("Local inference requires both --execute-local and --approve-local-inference")
+                validate_private_path(args.out)
                 output = execute_local(bundle, args.model, port=args.port, root=args.input.parent)
                 save_private_receipt(output, args.out)
                 print(f"Saved private model receipt with {len(output['receipts'])} reviews; human review required")
