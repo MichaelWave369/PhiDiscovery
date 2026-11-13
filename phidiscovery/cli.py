@@ -110,6 +110,12 @@ def main(argv: list[str] | None = None) -> int:
     cmd_rs.add_argument("commitment", type=Path)
     cmd_rs.add_argument("holdout", type=Path, help="R0.6 repeated-trial holdout and exposure audit")
     cmd_rs.add_argument("--out", type=Path, required=True, help="New private report outside Git")
+    cmd_mf = commands.add_parser("manifest-audit", help="Audit declared model data record IDs against held-out trials (offline)")
+    cmd_mf.add_argument("input", type=Path, help="Unchanged R0.5 registered prediction plan")
+    cmd_mf.add_argument("commitment", type=Path)
+    cmd_mf.add_argument("holdout", type=Path, help="R0.6 repeated-trial holdout")
+    cmd_mf.add_argument("manifest", type=Path, help="R0.7 model dataset ID manifest")
+    cmd_mf.add_argument("--out", type=Path, required=True, help="New private report outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -148,6 +154,18 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "manifest-audit":
+            from .manifest_audit import audit_manifest
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            report = audit_manifest(
+                _json(args.input), _json(args.commitment), _json(args.holdout),
+                _json(args.manifest))
+            save_private_receipt(report, args.out)
+            print(f"Saved manifest audit: {report['manifest_status']} "
+                  f"(ranking suppressed={report['ranking_suppressed']}; "
+                  "no actual training corpus authenticated)")
             return 0
         if args.command == "replicate-score":
             from .replicates import score_replicates

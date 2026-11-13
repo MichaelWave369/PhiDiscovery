@@ -1,0 +1,26 @@
+{
+  "schema_version": "0.7",
+  "study_id": "toy-pendulum-holdout-r05",
+  "holdout_id": "fictional-pendulum-a1",
+  "identifier_namespace": "phi369.synthetic-pendulum.r06",
+  "model_datasets": [
+    {
+      "model_id": "constant",
+      "inventory_complete_declared": true,
+      "notes": "FICTIONAL inventory for code testing; completeness is not verified.",
+      "datasets": [
+        {"dataset_id": "constant-toy-train", "split": "training", "record_ids": ["historic-pendulum-a", "historic-pendulum-b"]},
+        {"dataset_id": "constant-toy-eval", "split": "evaluation", "record_ids": ["historic-evaluation-c"]}
+      ]
+    },
+    {
+      "model_id": "nonlinear",
+      "inventory_complete_declared": true,
+      "notes": "FICTIONAL intentional leakage fixture: toy70-a is both a holdout trial and a listed training/evaluation ID.",
+      "datasets": [
+        {"dataset_id": "nonlinear-toy-train", "split": "training", "record_ids": ["historic-nonlinear-a", "toy70-a"]},
+        {"dataset_id": "nonlinear-toy-eval", "split": "evaluation", "record_ids": ["historic-evaluation-n", "toy70-a"]}
+      ]
+    }
+  ]
+}
