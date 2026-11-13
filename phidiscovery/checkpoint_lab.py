@@ -247,6 +247,19 @@ def compare_torch(record: dict, seeds: list[int], device: str = "cuda") -> dict:
         raise ValueError("checkpoint digest mismatch")
     if device != record.get("device"):
         raise ValueError("device differs from capture; no cross-device attribution")
+    import torch
+    if (record.get("torch_version") != torch.__version__
+            or record.get("cuda_runtime") != torch.version.cuda):
+        raise ValueError("PyTorch/CUDA runtime differs from capture; comparison refused")
+    if device == "cuda":
+        if not torch.cuda.is_available():
+            raise RuntimeError("CUDA unavailable; comparison refused")
+        live_props = torch.cuda.get_device_properties(0)
+        if (record.get("device_name") != torch.cuda.get_device_name(0)
+                or record.get("device_sm_count") != live_props.multi_processor_count):
+            raise ValueError("GPU device name or SM count differs from capture")
+    elif record.get("device_name") != "CPU":
+        raise ValueError("capture device metadata inconsistent with CPU replay")
     if not seeds or len(seeds) > 20 or len(set(seeds)) != len(seeds):
         raise ValueError("provide 1..20 distinct candidate seeds")
     if any(type(s) is not int or not 0 <= s < 2**63 for s in seeds):
