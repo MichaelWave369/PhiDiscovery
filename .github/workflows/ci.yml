@@ -105,3 +105,16 @@ jobs:
           python examples/demo_log_consistency_r11.py --out-dir "$TEMP_DIR"
           python -m phidiscovery log-consistency "$TEMP_DIR/demo-r11-older.json" "$TEMP_DIR/demo-r11-newer.json" "$TEMP_DIR/demo-r11-proof.json" "$TEMP_DIR/demo-r11-log-trust.json" --out "$TEMP_DIR/report.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['signed_checkpoints_valid'] and r['merkle_consistency_valid'] and r['tree_growth_proven']; assert not r['older_checkpoint_independently_retained_verified'] and not r['external_time_verified'] and not r['cross_client_non_equivocation_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/report.json"
+
+      - name: Verify synthetic cross-observer signed checkpoint gossip
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python examples/demo_gossip_r12.py --scenario conflict --out-dir "$TEMP_DIR"
+          python -m phidiscovery gossip-audit "$TEMP_DIR/demo-r12-conflict-gossip.json" "$TEMP_DIR/demo-r12-conflict-trust.json" --out "$TEMP_DIR/conflict-result.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['status']=='CONFLICTING_SIGNED_ROOTS_SAME_SIZE' and r['counts']['same_size_conflicts']==1; assert not r['global_non_equivocation_proven'] and not r['hypothesis_validated']" "$TEMP_DIR/conflict-result.json"
+          python examples/demo_gossip_r12.py --scenario unresolved --out-dir "$TEMP_DIR"
+          python -m phidiscovery gossip-audit "$TEMP_DIR/demo-r12-unresolved-gossip.json" "$TEMP_DIR/demo-r12-unresolved-trust.json" --out "$TEMP_DIR/unresolved-result.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['status']=='CROSS_SIZE_CONSISTENCY_UNRESOLVED' and r['counts']['cross_size_unresolved']==1" "$TEMP_DIR/unresolved-result.json"
+          python examples/demo_gossip_r12.py --scenario consistent --out-dir "$TEMP_DIR"
+          python -m phidiscovery gossip-audit "$TEMP_DIR/demo-r12-consistent-gossip.json" "$TEMP_DIR/demo-r12-consistent-trust.json" --out "$TEMP_DIR/consistent-result.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['status']=='NO_CONFLICT_IN_SUPPLIED_SIGNED_VIEWS__INDEPENDENCE_UNVERIFIED' and r['counts']['cross_size_verified']==1; assert not r['checkpoint_retention_history_verified']" "$TEMP_DIR/consistent-result.json"
