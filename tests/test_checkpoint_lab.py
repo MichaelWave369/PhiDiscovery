@@ -96,6 +96,14 @@ class TorchLocalTests(unittest.TestCase):
         self.assertEqual(report["selected_candidate"]["seed"], 42)
         self.assertEqual(report["hardware_attribution"], "NOT_PERFORMED")
         self.assertFalse(report["published_model_provenance_verified"])
+        stale = dict(record)
+        stale["torch_version"] = "another-framework-version"
+        with self.assertRaisesRegex(ValueError, "runtime differs"):
+            compare_torch(stale, seeds=[42], device="cpu")
+        inconsistent = dict(record)
+        inconsistent["device_name"] = "pretend-cuda-device"
+        with self.assertRaisesRegex(ValueError, "inconsistent"):
+            compare_torch(inconsistent, seeds=[42], device="cpu")
         record["values"][0] = 999
         with self.assertRaisesRegex(ValueError, "digest mismatch"):
             compare_torch(record, seeds=[42], device="cpu")
