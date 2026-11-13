@@ -105,6 +105,17 @@ The offline `content-audit` command compares **operator-provided source excerpts
 python -m unittest tests.test_content_audit -v
 ```
 
+## Second Map R0.9: signed provenance receipts (optional Ed25519)
+
+`anchor-draft` exports an unsigned, deterministic publisher claim for a PhiDiscovery research receipt. `anchor-verify` checks two separate Ed25519 signatures from a publisher and witness against **operator-pinned public keys**, and refuses tampering or mismatched artifacts. The core research workflow remains offline and dependency-free; the signature verifier uses the optional `cryptography` package:
+
+```bash
+python -m pip install ".[provenance]"
+python -m unittest tests.test_provenance -v
+```
+
+**A valid signature does not prove identity, witness independence, actual observation time, or scientific truth.** The included demo intentionally signs a false historical timestamp to make that distinction impossible to miss. See [Second Map Signed Provenance R0.9](docs/SECOND_MAP_SIGNED_PROVENANCE_R09.md).
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:

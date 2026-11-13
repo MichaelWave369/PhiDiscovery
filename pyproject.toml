@@ -11,6 +11,9 @@ dependencies = []
 license = "MIT"
 authors = [{name = "PHI369 Labs"}]
 
+[project.optional-dependencies]
+provenance = ["cryptography>=42,<48"]
+
 [project.scripts]
 phi-discovery = "phidiscovery.cli:main"
 

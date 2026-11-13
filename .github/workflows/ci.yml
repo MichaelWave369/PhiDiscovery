@@ -10,6 +10,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install optional signed-provenance verifier for R0.9 tests
+        run: python -m pip install ".[provenance]"
       - name: Run offline tests
         run: python -m unittest discover -s tests -v
       - name: Exercise pilot and check deterministic receipt
@@ -78,3 +80,12 @@ jobs:
           python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
           python -m phidiscovery content-audit examples/prediction-plan-r05.json "$TEMP_DIR/lock.json" examples/synthetic-replicates-r06.json examples/synthetic-manifest-r08.json examples/synthetic-content-index-r08.json --out "$TEMP_DIR/content-audit.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); m={x['model_id']:x for x in r['models']}; assert r['status']=='EXACT_CONTENT_OVERLAP_IN_SUPPLIED_RECORDS' and r['ranking_suppressed'] and not r['hypothesis_validated']; assert m['nonlinear']['exact_content_matched_holdout_trial_count']==1 and m['nonlinear']['whitespace_candidate_trial_count']==1" "$TEMP_DIR/content-audit.json"
+
+      - name: Verify two fictional Ed25519 signatures with independently unverified clock
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
+          python -m phidiscovery anchor-draft "$TEMP_DIR/lock.json" --out "$TEMP_DIR/publisher-claim.json"
+          python examples/demo_signed_anchor_r09.py "$TEMP_DIR/lock.json" --out-dir "$TEMP_DIR"
+          python -m phidiscovery anchor-verify "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" --out "$TEMP_DIR/verification.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['publisher_ed25519_signature_valid'] and r['witness_ed25519_signature_valid'] and not r['independent_timestamp_authority_verified'] and not r['witness_actual_time_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/verification.json"
