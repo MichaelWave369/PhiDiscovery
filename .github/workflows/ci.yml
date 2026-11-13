@@ -64,3 +64,10 @@ jobs:
           python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
           python -m phidiscovery replicate-score examples/prediction-plan-r05.json "$TEMP_DIR/lock.json" examples/synthetic-replicates-r06.json --out "$TEMP_DIR/repeated-score.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['counts']['trials']==9 and r['counts']['targets']==3 and r['leakage_audit']['synthetic_data'] and not r['hypothesis_validated']" "$TEMP_DIR/repeated-score.json"
+
+      - name: Detect planted synthetic training/holdout overlap in manifests (offline)
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
+          python -m phidiscovery manifest-audit examples/prediction-plan-r05.json "$TEMP_DIR/lock.json" examples/synthetic-replicates-r06.json examples/synthetic-manifest-r07.json --out "$TEMP_DIR/audit.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['manifest_status']=='EXACT_IDENTIFIER_OVERLAP_DECLARED' and r['ranking_suppressed'] and not r['hypothesis_validated']; assert r['descriptive_r06_diagnostics']['descriptive_leaders_if_not_quarantined'] is None" "$TEMP_DIR/audit.json"
