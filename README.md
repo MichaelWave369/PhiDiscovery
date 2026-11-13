@@ -258,3 +258,15 @@ An experimental, offline-first checkpoint initialization research module now off
 
     python -m phidiscovery.checkpoint_lab synthetic --seed 953049583 --lanes 148 --out out/checkpoint-synthetic.json
 
+
+## Checkpoint Calibration R0.2: compare controlled PyTorch captures
+
+This next stage adds a **real local PyTorch capture protocol** with repeated identical-seed trials and off-by-one seed controls, plus an offline comparator that can compare two documented machines. All device and source identities are self-reported, so the results are descriptive and **never a proof of a GPU used to train an external model**. See [the R0.2 calibration runbook](docs/CHECKPOINT_CALIBRATION_R02.md).
+
+Run the standard-library-only synthetic control demonstration:
+
+    python -m phidiscovery.checkpoint_calibration demo --out out/calibration-demo.json
+
+With installed PyTorch and CUDA, record local evidence:
+
+    python -m phidiscovery.checkpoint_calibration capture --label gpu-a --device cuda --seed 369 --out out/gpu-a.json
