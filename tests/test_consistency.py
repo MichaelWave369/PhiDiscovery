@@ -38,7 +38,7 @@ def public(key):
 
 
 def leaves(n):
-    return [hashlib.sha256(b"\\x00" + f"FICTIONAL-leaf-{i}".encode()).digest()
+    return [hashlib.sha256(b"\x00" + f"FICTIONAL-leaf-{i}".encode()).digest()
             for i in range(n)]
 
 
@@ -179,7 +179,7 @@ class MerkleConsistencyTests(unittest.TestCase):
         with self.assertRaises(InputError):
             verify_consistency(older, changed, proof, policy)
         changed = copy.deepcopy(older)
-        changed["signature_base64"] = b64(b"\\x00" * 64)
+        changed["signature_base64"] = b64(b"\x00" * 64)
         with self.assertRaises(InputError):
             verify_consistency(changed, newer, proof, policy)
 
