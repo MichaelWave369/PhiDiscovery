@@ -144,6 +144,10 @@ def main(argv: list[str] | None = None) -> int:
     cmd_lc.add_argument("proof", type=Path, help="Merkle consistency proof for the two roots")
     cmd_lc.add_argument("log_trust", type=Path, help="Pinned R1.0 log public key and tree-size floor")
     cmd_lc.add_argument("--out", type=Path, required=True, help="New private report outside Git checkout")
+    cmd_ga = commands.add_parser("gossip-audit", help="Compare signed checkpoints seen by multiple observers (offline)")
+    cmd_ga.add_argument("bundle", type=Path, help="R1.2 signed observer claims plus optional R1.1 proofs")
+    cmd_ga.add_argument("trust", type=Path, help="Pinned log and observer public keys")
+    cmd_ga.add_argument("--out", type=Path, required=True, help="New private report outside Git checkout")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -182,6 +186,19 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "gossip-audit":
+            from .gossip import audit_gossip
+            from .provenance import load_strict_json
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            result = audit_gossip(
+                load_strict_json(args.bundle),
+                load_strict_json(args.trust))
+            save_private_receipt(result, args.out)
+            print(f"Checked {result['counts']['signed_observations']} signed observer "
+                  f"views: {result['status']}. Identity, time and global "
+                  "non-equivocation NOT verified.")
             return 0
         if args.command == "log-consistency":
             from .consistency import verify_consistency
