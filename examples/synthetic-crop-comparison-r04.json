@@ -1,0 +1,58 @@
+{
+  "schema": "phi-crop-geometry-comparison/v0.3",
+  "createdAt": "2026-11-13T00:00:00Z",
+  "method": "ordered-normalized-radii-v1",
+  "reference": {
+    "schema": "phi-crop-fingerprint/v0.3",
+    "name": "Synthetic rings A",
+    "sourceType": "synthetic",
+    "ringCount": 4,
+    "radii": [
+      18,
+      40,
+      60,
+      100
+    ],
+    "normalizedRadii": [
+      0.18,
+      0.4,
+      0.6,
+      1
+    ],
+    "notes": "Fictional teaching fixture"
+  },
+  "candidate": {
+    "schema": "phi-crop-fingerprint/v0.3",
+    "name": "Synthetic scaled copy B",
+    "sourceType": "synthetic",
+    "ringCount": 4,
+    "radii": [
+      36,
+      80,
+      120,
+      200
+    ],
+    "normalizedRadii": [
+      0.18,
+      0.4,
+      0.6,
+      1
+    ],
+    "notes": "Fictional teaching fixture"
+  },
+  "comparison": {
+    "method": "ordered-normalized-radii-v1",
+    "first": "Synthetic rings A",
+    "second": "Synthetic scaled copy B",
+    "ringCounts": [
+      4,
+      4
+    ],
+    "score": 100,
+    "normalizedDistance": 0,
+    "status": "exploratory-geometry-only"
+  },
+  "nullSimulation": null,
+  "searchedLibrarySize": 5,
+  "caveat": "Synthetic only. Geometry score has no calibrated significance."
+}
