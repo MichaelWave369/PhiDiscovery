@@ -131,6 +131,13 @@ def main(argv: list[str] | None = None) -> int:
     cmd_av.add_argument("anchor", type=Path, help="Externally signed publisher and witness claims")
     cmd_av.add_argument("trust_policy", type=Path, help="Operator-pinned public keys distributed out of band")
     cmd_av.add_argument("--out", type=Path, required=True, help="New private verification receipt outside Git")
+    cmd_lv = commands.add_parser("log-verify", help="Verify pinned signed log checkpoint and Merkle inclusion (offline)")
+    cmd_lv.add_argument("artifact", type=Path, help="Original PhiDiscovery research receipt")
+    cmd_lv.add_argument("anchor", type=Path, help="R0.9 publisher/witness signed anchor")
+    cmd_lv.add_argument("publisher_trust", type=Path, help="R0.9 independently pinned public keys")
+    cmd_lv.add_argument("proof", type=Path, help="R1.0 signed checkpoint and audit path")
+    cmd_lv.add_argument("log_trust", type=Path, help="Separately obtained pinned log public key")
+    cmd_lv.add_argument("--out", type=Path, required=True, help="New private verification report outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -169,6 +176,22 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "log-verify":
+            from .transparency import verify_log_inclusion
+            from .provenance import load_strict_json
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            result = verify_log_inclusion(
+                load_strict_json(args.artifact),
+                load_strict_json(args.anchor),
+                load_strict_json(args.publisher_trust),
+                load_strict_json(args.proof),
+                load_strict_json(args.log_trust),
+            )
+            save_private_receipt(result, args.out)
+            print("PASS: signed checkpoint and inclusion proof valid. "
+                  "Operator identity, actual time and append-only consistency NOT verified.")
             return 0
         if args.command in ("anchor-draft", "anchor-verify"):
             from .provenance import draft_publisher_claim, verify_anchor, load_strict_json
