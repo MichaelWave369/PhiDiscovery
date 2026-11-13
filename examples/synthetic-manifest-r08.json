@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.7",
+  "study_id": "toy-pendulum-holdout-r05",
+  "holdout_id": "fictional-pendulum-a1",
+  "identifier_namespace": "phi369.synthetic-pendulum.r06",
+  "model_datasets": [
+    {
+      "model_id": "constant",
+      "inventory_complete_declared": true,
+      "notes": "FICTIONAL R0.8 data inventory; no direct identifier matches.",
+      "datasets": [
+        {
+          "dataset_id": "constant-toy-train",
+          "split": "training",
+          "record_ids": [
+            "historic-pendulum-a",
+            "historic-pendulum-b"
+          ]
+        },
+        {
+          "dataset_id": "constant-toy-eval",
+          "split": "evaluation",
+          "record_ids": [
+            "historic-evaluation-c"
+          ]
+        }
+      ]
+    },
+    {
+      "model_id": "nonlinear",
+      "inventory_complete_declared": true,
+      "notes": "FICTIONAL R0.8 manifest: renamed training record has no matching holdout ID, but an identical content excerpt.",
+      "datasets": [
+        {
+          "dataset_id": "nonlinear-toy-train",
+          "split": "training",
+          "record_ids": [
+            "historic-nonlinear-a",
+            "alias-renamed-40-b"
+          ]
+        },
+        {
+          "dataset_id": "nonlinear-toy-eval",
+          "split": "evaluation",
+          "record_ids": [
+            "historic-evaluation-n",
+            "alias-renamed-40-b"
+          ]
+        }
+      ]
+    }
+  ]
+}
