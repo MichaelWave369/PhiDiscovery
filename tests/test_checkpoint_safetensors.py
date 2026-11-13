@@ -147,6 +147,16 @@ class SafetensorsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "numeric constant"):
             inspect_file(f)
 
+    def test_metadata_must_be_string_map_not_null_or_nested_values(self):
+        for metadata in [None, {"format": 7}, {"invalid": {"nested": "no"}}]:
+            with self.subTest(metadata=metadata):
+                f = make_custom(self.base / "metadata.safetensors",
+                                {"__metadata__": metadata,
+                                 "x": {"dtype": "F32", "shape": [1], "data_offsets": [0, 4]}},
+                                b"\x00" * 4)
+                with self.assertRaisesRegex(ValueError, "metadata"):
+                    inspect_file(f)
+
     def test_reject_oversized_header_and_truncation(self):
         f = self.base / "too-large.safetensors"
         f.write_bytes(struct.pack("<Q", 8 * 1024 * 1024 + 1) + b"{}")
