@@ -39,6 +39,9 @@ def main(argv: list[str] | None = None) -> int:
     cmd_mb = commands.add_parser("massbank-import", help="Convert local licensed MassBank MS2 records to a traceable reference library")
     cmd_mb.add_argument("records", type=Path, nargs="+")
     cmd_mb.add_argument("--out", type=Path, required=True)
+    cmd_crop = commands.add_parser("crop-import", help="Import PhiMathAtelier r0.3 geometry comparison as inconclusive evidence (offline)")
+    cmd_crop.add_argument("input", type=Path, help="Fingerprint Atlas comparison JSON receipt")
+    cmd_crop.add_argument("--out", type=Path, default=Path("out/crop-geometry"))
     cmd_q = commands.add_parser("quantum-brain", help="Generate a synthetic Quantum Brain Lab report (offline)")
     cmd_q.add_argument("--out", type=Path, default=Path("out/brain"))
     cmd_q.add_argument("--duration-ms", type=float, default=160.0)
@@ -146,6 +149,28 @@ def main(argv: list[str] | None = None) -> int:
     cmd_lc.add_argument("--out", type=Path, required=True, help="New private report outside Git checkout")
     args = parser.parse_args(argv)
     try:
+        if args.command == "crop-import":
+            from .crop_geometry import import_comparison, sha256_bytes
+            raw = args.input.read_bytes()
+            if len(raw) > 2 * 1024 * 1024:
+                raise InputError("Crop comparison receipt exceeds 2 MiB cap")
+            receipt = json.loads(raw.decode("utf-8"))
+            bundle, audit = import_comparison(receipt, sha256_bytes(raw))
+            report = analyze(bundle)
+            args.out.mkdir(parents=True, exist_ok=True)
+            for filename, data in (
+                ("evidence-bundle.json", bundle),
+                ("adapter-audit.json", audit),
+                ("triage-report.json", report),
+            ):
+                (args.out / filename).write_text(
+                    json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
+                    encoding="utf-8",
+                )
+            save_report(report, args.out / "triage-report.html")
+            print(f"Saved geometry evidence bundle and audit to {args.out}; "
+                  "1 inconclusive record, 0 eligible support, no encoded message verified")
+            return 0
         if args.command == "quantum-brain":
             from .quantum_brain import LabConfig, save_lab
             config = LabConfig(duration_ms=args.duration_ms, step_ms=args.step_ms,
