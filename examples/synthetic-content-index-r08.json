@@ -1,0 +1,104 @@
+{
+  "schema_version": "0.8",
+  "study_id": "toy-pendulum-holdout-r05",
+  "holdout_id": "fictional-pendulum-a1",
+  "identifier_namespace": "phi369.synthetic-pendulum.r06",
+  "holdout_records": [
+    {
+      "trial_id": "toy05-a",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-05, measured period=2.002 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy05-b",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-05, measured period=2.008 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy05-c",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-05, measured period=2.005 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy40-a",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.073 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy40-b",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.077 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy40-c",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.075 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy70-a",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-70, measured period=2.242 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy70-b",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-70, measured period=2.246 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "trial_id": "toy70-c",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-70, measured period=2.244 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    }
+  ],
+  "model_records": [
+    {
+      "model_id": "constant",
+      "dataset_id": "constant-toy-train",
+      "record_id": "historic-pendulum-a",
+      "media_type": "text/plain",
+      "content": "Independent FICTIONAL reference excerpt describing calibration procedures and model background notes, not a holdout measurement. Dataset=constant/constant-toy-train, source_record=historic-pendulum-a."
+    },
+    {
+      "model_id": "constant",
+      "dataset_id": "constant-toy-train",
+      "record_id": "historic-pendulum-b",
+      "media_type": "text/plain",
+      "content": "Independent FICTIONAL reference excerpt describing calibration procedures and model background notes, not a holdout measurement. Dataset=constant/constant-toy-train, source_record=historic-pendulum-b."
+    },
+    {
+      "model_id": "constant",
+      "dataset_id": "constant-toy-eval",
+      "record_id": "historic-evaluation-c",
+      "media_type": "text/plain",
+      "content": "Independent FICTIONAL reference excerpt describing calibration procedures and model background notes, not a holdout measurement. Dataset=constant/constant-toy-eval, source_record=historic-evaluation-c."
+    },
+    {
+      "model_id": "nonlinear",
+      "dataset_id": "nonlinear-toy-train",
+      "record_id": "historic-nonlinear-a",
+      "media_type": "text/plain",
+      "content": "Independent FICTIONAL reference excerpt describing calibration procedures and model background notes, not a holdout measurement. Dataset=nonlinear/nonlinear-toy-train, source_record=historic-nonlinear-a."
+    },
+    {
+      "model_id": "nonlinear",
+      "dataset_id": "nonlinear-toy-train",
+      "record_id": "alias-renamed-40-b",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.077 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "model_id": "nonlinear",
+      "dataset_id": "nonlinear-toy-eval",
+      "record_id": "historic-evaluation-n",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-05,  \n measured period=2.002 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    },
+    {
+      "model_id": "nonlinear",
+      "dataset_id": "nonlinear-toy-eval",
+      "record_id": "alias-renamed-40-b",
+      "media_type": "text/plain",
+      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.077 seconds, procedure=toy-protocol-r06, observer=synthetic."
+    }
+  ]
+}
