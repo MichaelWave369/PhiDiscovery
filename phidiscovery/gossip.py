@@ -13,7 +13,7 @@ from itertools import combinations
 from .engine import InputError, sha256
 from .predictions import _keys, _text
 from .provenance import _b64, _timestamp, _trust_key, _verify_signature
-from .transparency import TRUST_SCHEMA as LOG_TRUST_SCHEMA
+from .transparency import TRUST_SCHEMA as LOG_TRUST_SCHEMA, _strict_int, MAX_TREE_SIZE
 from .consistency import _signed_checkpoint, verify_consistency
 
 GOSSIP_SCHEMA = "phidiscovery.observer-gossip.v1.2"
@@ -55,6 +55,8 @@ def audit_gossip(bundle: dict, trust: dict) -> dict:
     if log_trust["schema"] != LOG_TRUST_SCHEMA:
         raise InputError("Unsupported log trust schema")
     log_id = _text(log_trust["log_id"], "log_id", cap=120)
+    floor = _strict_int(log_trust["minimum_tree_size"],
+                        "minimum_tree_size", 1, MAX_TREE_SIZE)
     log_key_id, log_pub = _trust_key(log_trust["key"], "log key")
 
     keys = trust["observer_keys"]
@@ -94,7 +96,7 @@ def audit_gossip(bundle: dict, trust: dict) -> dict:
         if oid not in pinned:
             raise InputError("Untrusted observer ID")
         cp = _signed_checkpoint(row["checkpoint"], log_id, log_pub)
-        if cp["tree_size"] < log_trust["minimum_tree_size"]:
+        if cp["tree_size"] < floor:
             raise InputError("Checkpoint below pinned tree-size floor")
         claim = row["claim"]
         _keys(claim, {"schema", "observer_id", "checkpoint_envelope_sha256",
