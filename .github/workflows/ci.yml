@@ -71,3 +71,10 @@ jobs:
           python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
           python -m phidiscovery manifest-audit examples/prediction-plan-r05.json "$TEMP_DIR/lock.json" examples/synthetic-replicates-r06.json examples/synthetic-manifest-r07.json --out "$TEMP_DIR/audit.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['manifest_status']=='EXACT_IDENTIFIER_OVERLAP_DECLARED' and r['ranking_suppressed'] and not r['hypothesis_validated']; assert r['descriptive_r06_diagnostics']['descriptive_leaders_if_not_quarantined'] is None" "$TEMP_DIR/audit.json"
+
+      - name: Detect renamed synthetic training/holdout content and quarantine (offline)
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
+          python -m phidiscovery content-audit examples/prediction-plan-r05.json "$TEMP_DIR/lock.json" examples/synthetic-replicates-r06.json examples/synthetic-manifest-r08.json examples/synthetic-content-index-r08.json --out "$TEMP_DIR/content-audit.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); m={x['model_id']:x for x in r['models']}; assert r['status']=='EXACT_CONTENT_OVERLAP_IN_SUPPLIED_RECORDS' and r['ranking_suppressed'] and not r['hypothesis_validated']; assert m['nonlinear']['exact_content_matched_holdout_trial_count']==1 and m['nonlinear']['whitespace_candidate_trial_count']==1" "$TEMP_DIR/content-audit.json"
