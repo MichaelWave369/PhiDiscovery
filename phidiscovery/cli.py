@@ -151,7 +151,6 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "crop-import":
             from .crop_geometry import import_comparison, sha256_bytes
-            from .engine import analyze
             raw = args.input.read_bytes()
             if len(raw) > 2 * 1024 * 1024:
                 raise InputError("Crop comparison receipt exceeds 2 MiB cap")
