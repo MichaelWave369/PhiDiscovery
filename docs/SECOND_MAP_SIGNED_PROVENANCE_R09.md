@@ -36,7 +36,7 @@ python -m phidiscovery anchor-verify "$HOME\PhiPrivateReviews\r09-lock.json" `
   --out "$HOME\PhiPrivateReviews\r09-verification.json"
 ```
 
-Each result is exclusively created outside Git; no files or signatures are silently overwritten or published.
+Each result is exclusively created outside Git; no files or signatures are silently overwritten or published. Both commands use strict UTF-8 JSON parsing for provenance inputs, rejecting duplicate keys and nonstandard values such as `NaN` before canonical signatures are examined.
 
 ## End-to-end educational example: entirely fictional
 
