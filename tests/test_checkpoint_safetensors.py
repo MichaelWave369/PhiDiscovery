@@ -116,7 +116,7 @@ class SafetensorsTests(unittest.TestCase):
     def test_gap_overlap_and_extra_data_rejected(self):
         for name, offsets, body in [
             ("gap", [1, 5], b"\x00" * 5),
-            ("overlap", [0, 8], b"\x00" * 8),
+            ("overlap", [2, 6], b"\x00" * 6),
             ("extra", [0, 4], b"\x00" * 8),
         ]:
             with self.subTest(name=name):
