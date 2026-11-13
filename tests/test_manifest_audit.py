@@ -95,6 +95,20 @@ class ManifestAuditTests(unittest.TestCase):
         self.assertEqual(item["matched_holdout_record_count"], 0)
         self.assertEqual(item["cross_split_identifier_count"], 1)
 
+    def test_repeated_identifiers_across_same_split_datasets_quarantine(self):
+        p, lock, h, m = inputs()
+        remove_planted_overlap(m)
+        m["model_datasets"][0]["datasets"].append({
+            "dataset_id": "duplicate-training-source",
+            "split": "training",
+            "record_ids": ["historic-pendulum-a"],
+        })
+        r = audit_manifest(p, lock, h, m)
+        self.assertEqual(r["manifest_status"], "INCOMPLETE_OR_UNCERTAIN_EXPOSURE")
+        self.assertTrue(r["ranking_suppressed"])
+        self.assertEqual(r["model_manifest_audit"][0]["cross_dataset_identifier_count"], 1)
+        self.assertEqual(r["model_manifest_audit"][0]["cross_split_identifier_count"], 0)
+
     def test_prior_exposure_already_declared_in_r06_still_quarantines(self):
         p, lock, h, m = inputs()
         remove_planted_overlap(m)
