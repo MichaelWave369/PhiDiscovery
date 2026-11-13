@@ -96,9 +96,9 @@
     {
       "model_id": "nonlinear",
       "dataset_id": "nonlinear-toy-eval",
-      "record_id": "alias-renamed-40-b",
+      "record_id": "historic-evaluation-extra",
       "media_type": "text/plain",
-      "content": "FICTIONAL pendulum source excerpt, angle=theta-40, measured period=2.077 seconds, procedure=toy-protocol-r06, observer=synthetic."
+      "content": "FICTIONAL separate evaluation document about calibration set-up, deliberately different from any held-out transcript or training sample."
     }
   ]
 }
