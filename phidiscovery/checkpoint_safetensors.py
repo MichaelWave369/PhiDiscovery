@@ -199,8 +199,9 @@ def inspect_file(path: Path, *, model_id: str | None = None,
     header, data_start, file_size, header_digest = _read_header(path)
     if len(header) > MAX_TENSORS + 1:
         raise ValueError("too many tensor header entries")
+    has_metadata = "__metadata__" in header
     metadata = header.pop("__metadata__", None)
-    if metadata is not None:
+    if has_metadata:
         if type(metadata) is not dict or len(metadata) > 1000:
             raise ValueError("invalid safetensors string metadata")
         for key, value in metadata.items():
