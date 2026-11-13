@@ -270,3 +270,10 @@ Run the standard-library-only synthetic control demonstration:
 With installed PyTorch and CUDA, record local evidence:
 
     python -m phidiscovery.checkpoint_calibration capture --label gpu-a --device cuda --seed 369 --out out/gpu-a.json
+
+
+## Checkpoint Archaeology R0.3: safe local safetensors inspection
+
+New offline, read-only inspection of local .safetensors weights, with validated tensor shapes/offsets, optional streamed file/tensor hashes, deliberately limited opt-in value previews, and an evidence-limited manifest comparison. **No model execution, published GPU attribution, or verified model lineage.** See [R0.3 checkpoint runbook](docs/CHECKPOINT_SAFETENSORS_R03.md).
+
+    python -m phidiscovery.checkpoint_safetensors inspect path/to/model.safetensors --hash-file --hash-tensors --out out/model-manifest.json

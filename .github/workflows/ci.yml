@@ -113,3 +113,8 @@ jobs:
           python -m phidiscovery.checkpoint_calibration demo --out "$TEMP_DIR/calibration-demo.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); s=r['same_simulated_layout']; d=r['different_simulated_layout']; assert s['descriptive_summary']['all_cross_machine_values_bit_identical']; assert not d['descriptive_summary']['all_cross_machine_values_bit_identical']; assert not s['hardware_identity_verified'] and not d['actual_training_hardware_verified']; assert s['evidence_class']=='SYNTHETIC_DEMO_ONLY'" "$TEMP_DIR/calibration-demo.json"
           python -m unittest discover -s tests -p 'test_checkpoint_calibration.py' -v
+
+
+      - name: R0.3 exercise offline safetensors inspection with test-generated fixtures
+        run: |
+          python -m unittest discover -s tests -p 'test_checkpoint_safetensors.py' -v
