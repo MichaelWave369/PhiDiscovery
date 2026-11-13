@@ -8,6 +8,17 @@ Status: **research prototype, not an autonomous scientist or validated analytica
 
 Build the general research engine before specializing it. Domain-specific analysis belongs in optional rules, not the core pipeline. Every supported claim must be traceable to its origin; independence, contradictions, data integrity, and uncertainty must be visible. We keep a skeptical agent in every run.
 
+## Crop geometry evidence bridge R0.4 (offline)
+
+PhiDiscovery can now ingest a `phi-crop-geometry-comparison/v0.3` receipt from PhiMathAtelier's Fingerprint Atlas and recompute its concentric-ring similarity independently. The output is a conventional evidence bundle, skeletal skeptical audit, and deterministic HTML/JSON triage report. All geometry comparisons are **inconclusive** until independent source measurements, uncertainties and suitable controls are available; a high score is not a decoded message.
+
+```bash
+python -m phidiscovery crop-import examples/synthetic-crop-comparison-r04.json --out out/crop-fixture
+python -m phidiscovery check out/crop-fixture/evidence-bundle.json out/crop-fixture/triage-report.json
+```
+
+This example is **synthetic**. Details and limitations: [Crop Geometry Bridge R0.4](docs/CROP_GEOMETRY_BRIDGE_R04.md).
+
 ## Capabilities in v0.1.0
 
 1. **Input contract:** JSON evidence bundles containing hypotheses, findings, declared source independence, data modalities and (optionally) local raw-data hashes.
