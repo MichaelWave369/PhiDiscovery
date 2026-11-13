@@ -19,6 +19,17 @@ python -m phidiscovery check out/crop-fixture/evidence-bundle.json out/crop-fixt
 
 This example is **synthetic**. Details and limitations: [Crop Geometry Bridge R0.4](docs/CROP_GEOMETRY_BRIDGE_R04.md).
 
+## Crop observation source and uncertainty audit R0.5
+
+The offline `crop-audit` command now audits declared image/source relationships, source byte hashes, and **sensitivity to bounded measurement errors**. Repeated image hashes, capture IDs, and declared derivative chains are flagged; pairs without known links remain `not_proven_independent`, not independently confirmed. Uniform perturbation quantiles are sensitivity summaries, **not calibrated confidence intervals**. Every imported record remains **inconclusive**.
+
+```bash
+python -m phidiscovery crop-audit examples/synthetic-crop-observations-r05.json --out out/crop-r05
+python -m phidiscovery check out/crop-r05/evidence-bundle.json out/crop-r05/triage-report.json
+```
+
+The example is explicitly **fictional**, including its image hashes. See [Crop Observation Audit R0.5](docs/CROP_OBSERVATION_AUDIT_R05.md).
+
 ## Capabilities in v0.1.0
 
 1. **Input contract:** JSON evidence bundles containing hypotheses, findings, declared source independence, data modalities and (optionally) local raw-data hashes.

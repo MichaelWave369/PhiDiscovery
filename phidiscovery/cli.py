@@ -42,6 +42,9 @@ def main(argv: list[str] | None = None) -> int:
     cmd_crop = commands.add_parser("crop-import", help="Import PhiMathAtelier r0.3 geometry comparison as inconclusive evidence (offline)")
     cmd_crop.add_argument("input", type=Path, help="Fingerprint Atlas comparison JSON receipt")
     cmd_crop.add_argument("--out", type=Path, default=Path("out/crop-geometry"))
+    cmd_ca = commands.add_parser("crop-audit", help="Audit crop measurement uncertainty and source lineage (offline)")
+    cmd_ca.add_argument("input", type=Path, help="Crop observation manifest R0.5 JSON")
+    cmd_ca.add_argument("--out", type=Path, default=Path("out/crop-observations"))
     cmd_q = commands.add_parser("quantum-brain", help="Generate a synthetic Quantum Brain Lab report (offline)")
     cmd_q.add_argument("--out", type=Path, default=Path("out/brain"))
     cmd_q.add_argument("--duration-ms", type=float, default=160.0)
@@ -149,6 +152,31 @@ def main(argv: list[str] | None = None) -> int:
     cmd_lc.add_argument("--out", type=Path, required=True, help="New private report outside Git checkout")
     args = parser.parse_args(argv)
     try:
+        if args.command == "crop-audit":
+            from .crop_observations import audit_observations
+            from .crop_geometry import sha256_bytes
+            raw = args.input.read_bytes()
+            if len(raw) > 2 * 1024 * 1024:
+                raise InputError("Crop observation manifest exceeds 2 MiB cap")
+            manifest = json.loads(raw.decode("utf-8"))
+            bundle, audit = audit_observations(manifest, root=args.input.parent,
+                                               input_sha256=sha256_bytes(raw))
+            report = analyze(bundle)
+            args.out.mkdir(parents=True, exist_ok=True)
+            for filename, data in (
+                ("evidence-bundle.json", bundle),
+                ("source-audit.json", audit),
+                ("triage-report.json", report),
+            ):
+                (args.out / filename).write_text(
+                    json.dumps(data, indent=2, ensure_ascii=False, allow_nan=False) + "\n",
+                    encoding="utf-8",
+                )
+            save_report(report, args.out / "triage-report.html")
+            print(f"Saved source and measurement audit to {args.out}; "
+                  f"{len(audit['comparisons'])} comparisons, "
+                  "0 eligible support, no decoded messages")
+            return 0
         if args.command == "crop-import":
             from .crop_geometry import import_comparison, sha256_bytes
             raw = args.input.read_bytes()
