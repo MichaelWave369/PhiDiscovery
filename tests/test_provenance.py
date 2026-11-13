@@ -198,6 +198,21 @@ class SignedAnchorTests(unittest.TestCase):
         self.assertEqual(witness_claim, anchor["witness"]["claim"])
         self.assertNotIn("signature_base64", witness_claim)
 
+    def test_signed_json_rejects_duplicate_keys_and_nonstandard_numbers(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "ambiguous.json"
+            output = root / "draft.json"
+            source.write_text('{"schema":"phidiscovery.prediction-commitment.v0.5",'
+                              '"schema":"phidiscovery.prediction-commitment.v0.5"}',
+                              encoding="utf-8")
+            self.assertEqual(main(["anchor-draft", str(source), "--out", str(output)]), 2)
+            self.assertFalse(output.exists())
+            source.write_text('{"schema":"phidiscovery.prediction-commitment.v0.5",'
+                              '"untrusted_number":NaN}', encoding="utf-8")
+            self.assertEqual(main(["anchor-draft", str(source), "--out", str(output)]), 2)
+            self.assertFalse(output.exists())
+
     def test_cli_generate_unsigned_and_verify_private_receipt(self):
         artifact, anchor, trust = signed_fixture()
         with tempfile.TemporaryDirectory() as folder:
