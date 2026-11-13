@@ -1,0 +1,92 @@
+{
+  "schema": "phi-crop-observation-manifest/v0.5",
+  "note": "FICTIONAL measurements and SHA-256 labels for testing only; no crop-circle observation.",
+  "seed": 369,
+  "sensitivity_trials": 256,
+  "observations": [
+    {
+      "id": "SYN-A",
+      "analyst": "Synthetic Observer A",
+      "radii": [
+        18,
+        40,
+        60,
+        100
+      ],
+      "uncertainty_px": [
+        1,
+        2,
+        2,
+        3
+      ],
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://crop/fictional-image-a",
+        "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "capture_id": "fictional-capture-1",
+        "parent_ids": [],
+        "license": "fictional"
+      }
+    },
+    {
+      "id": "SYN-B",
+      "analyst": "Synthetic Observer B",
+      "radii": [
+        36,
+        80,
+        120,
+        200
+      ],
+      "uncertainty_px": [
+        2,
+        4,
+        4,
+        6
+      ],
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://crop/fictional-derivative-b",
+        "image_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "capture_id": "fictional-capture-1",
+        "parent_ids": [
+          "SYN-A"
+        ],
+        "license": "fictional"
+      }
+    },
+    {
+      "id": "SYN-C",
+      "analyst": "Synthetic Observer C",
+      "radii": [
+        5,
+        10,
+        11,
+        95
+      ],
+      "uncertainty_px": [
+        0.2,
+        0.2,
+        0.2,
+        1
+      ],
+      "source": {
+        "type": "synthetic",
+        "locator": "fixture://crop/fictional-image-c",
+        "image_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "capture_id": "fictional-capture-2",
+        "parent_ids": [],
+        "license": "fictional"
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "reference_id": "SYN-A",
+      "candidate_id": "SYN-B"
+    },
+    {
+      "reference_id": "SYN-A",
+      "candidate_id": "SYN-C"
+    }
+  ]
+}
