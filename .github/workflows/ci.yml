@@ -24,6 +24,12 @@ jobs:
           python -m phidiscovery check pilot-out/crop/evidence-bundle.json pilot-out/crop/triage-report.json
           python -c "import json; p=json.load(open('pilot-out/crop/triage-report.json')); assert p['results'][0]['stage']=='insufficient_evidence' and p['results'][0]['eligible_support_count']==0"
 
+      - name: Audit fictional crop-image lineages and radius uncertainty (offline)
+        run: |
+          python -m phidiscovery crop-audit examples/synthetic-crop-observations-r05.json --out pilot-out/crop-r05
+          python -m phidiscovery check pilot-out/crop-r05/evidence-bundle.json pilot-out/crop-r05/triage-report.json
+          python -c "import json; a=json.load(open('pilot-out/crop-r05/source-audit.json')); r=json.load(open('pilot-out/crop-r05/triage-report.json')); assert a['counts']['linked_or_duplicate']==1 and a['counts']['eligible_support']==0; assert all(x['stage']=='insufficient_evidence' for x in r['results'])"
+
       - name: Exercise generic domain and offline spectrum adapter
         run: |
           python -m phidiscovery run examples/geology-pilot.json --out geology-out
