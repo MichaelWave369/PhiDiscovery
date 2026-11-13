@@ -18,6 +18,12 @@ jobs:
         run: |
           python -m phidiscovery run examples/cannabinoid-pilot.json --out pilot-out
           python -m phidiscovery check examples/cannabinoid-pilot.json pilot-out/report.json
+      - name: Exercise offline crop-geometry bridge with synthetic comparison
+        run: |
+          python -m phidiscovery crop-import examples/synthetic-crop-comparison-r04.json --out pilot-out/crop
+          python -m phidiscovery check pilot-out/crop/evidence-bundle.json pilot-out/crop/triage-report.json
+          python -c "import json; p=json.load(open('pilot-out/crop/triage-report.json')); assert p['results'][0]['stage']=='insufficient_evidence' and p['results'][0]['eligible_support_count']==0"
+
       - name: Exercise generic domain and offline spectrum adapter
         run: |
           python -m phidiscovery run examples/geology-pilot.json --out geology-out
