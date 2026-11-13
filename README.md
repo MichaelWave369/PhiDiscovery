@@ -126,6 +126,16 @@ PhiDiscovery now supports an offline `log-verify` command: it binds the original
 python -m unittest tests.test_transparency -v
 ```
 
+## Second Map R1.1: verifiable consistency between signed log roots
+
+`log-consistency` verifies **two** separately signed Merkle checkpoints under the *same operator-pinned log key*, then checks an RFC 9162-style consistency proof showing that the newer tree preserves the older prefix. It catches rewritten histories, incorrect proof siblings and rollback attempts against a retained size floor.
+
+The proof only establishes mathematical consistency between supplied signed roots. **Old checkpoint history, signer independence, honest timestamps and cross-client non-equivocation remain unverified.** A fictional seven-entry log demo uses an ephemeral key and bogus timestamps. See [R1.1 Consistency Proofs](docs/SECOND_MAP_CONSISTENCY_R11.md).
+
+```bash
+python -m unittest tests.test_consistency -v
+```
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
