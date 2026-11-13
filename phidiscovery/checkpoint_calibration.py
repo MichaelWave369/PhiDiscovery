@@ -123,7 +123,9 @@ def synthetic_demo_capture(label: str, seed: int, lanes: int = 148,
          "sm_count": None, "compute_capability": None}
     s = {"torch_version": None, "cuda_runtime": None}
     def sample(k: int, r: int, c: int):
-        return [_toy_value(k, lanes, i) for i in range(r * c)]
+        # Honor the declared float32 dtype even though the toy PRNG uses floats.
+        return [struct.unpack("<f", struct.pack("<f", _toy_value(k, lanes, i)))[0]
+                for i in range(r * c)]
     return _create_record(label, TOY_PROTOCOL, "SYNTHETIC_FIXTURE_NOT_HARDWARE",
                           d, s, seed, rows, cols, repeats, sample)
 
@@ -138,7 +140,7 @@ def _validate_capture(record: dict) -> None:
         "CONTROLLED_LOCAL_CAPTURE": PYTORCH_PROTOCOL,
         "SYNTHETIC_FIXTURE_NOT_HARDWARE": TOY_PROTOCOL,
     }
-    if allowed.get(kind) != protocol:
+    if type(kind) is not str or allowed.get(kind) != protocol:
         raise ValueError("capture data class/protocol mismatch")
     if record.get("hardware_identity_independently_verified") is not False:
         raise ValueError("capture must not claim authenticated hardware identity")
@@ -191,6 +193,9 @@ def _validate_capture(record: dict) -> None:
     for trial in trials:
         if type(trial) is not dict or set(trial) != {"replicate", "role", "seed", "values", "values_sha256_float64_le"}:
             raise ValueError("invalid trial record")
+        if (type(trial["replicate"]) is not int or
+                type(trial["role"]) is not str):
+            raise ValueError("trial replicate and role must be typed scalars")
         key = (trial["replicate"], trial["role"])
         if key not in expected or key in seen:
             raise ValueError("duplicate or unsupported trial role/replicate")
