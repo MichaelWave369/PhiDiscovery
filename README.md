@@ -116,6 +116,16 @@ python -m unittest tests.test_provenance -v
 
 **A valid signature does not prove identity, witness independence, actual observation time, or scientific truth.** The included demo intentionally signs a false historical timestamp to make that distinction impossible to miss. See [Second Map Signed Provenance R0.9](docs/SECOND_MAP_SIGNED_PROVENANCE_R09.md).
 
+## Second Map R1.0: signed transparency-log inclusion
+
+PhiDiscovery now supports an offline `log-verify` command: it binds the original research receipt and R0.9 publisher/witness signatures to a **Merkle inclusion proof** under a checkpoint signed by a *third, separately pinned* Ed25519 key. The verifier checks real cryptographic proof math across unbalanced trees, rejects forged paths and tampered checkpoints, and refuses checkpoints below an operator-supplied tree-size floor.
+
+**This is not yet a real third-party timestamp authority, public log client, or consistency auditor.** Even a valid signed root has an unverified timestamp and operator identity. The included demo is deliberately artificial, using ephemeral keys and a false claimed date. See [R1.0 Transparency Log Inclusion](docs/SECOND_MAP_TRANSPARENCY_R10.md).
+
+```bash
+python -m unittest tests.test_transparency -v
+```
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
