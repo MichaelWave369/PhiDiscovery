@@ -115,11 +115,14 @@ def audit_manifest(plan: dict, commitment: dict, holdout: dict, manifest: dict) 
             for record_id in dataset["record_ids"]:
                 h = fingerprint(namespace, record_id)
                 n_listed += 1
-                seen_hashes[h].add(split)
+                seen_hashes[h].add((split, dataset["dataset_id"]))
                 if h in trials:
                     match_hashes.add(h)
                     matched_splits.add(split)
-        cross_split = sorted(h for h, splits in seen_hashes.items() if len(splits) > 1)
+        cross_split = sorted(h for h, locations in seen_hashes.items()
+                             if len({split for split, _ in locations}) > 1)
+        cross_dataset = sorted(h for h, locations in seen_hashes.items()
+                               if len({dataset for _, dataset in locations}) > 1)
         empty = n_listed == 0
         complete = model["inventory_complete_declared"]
         issues = []
@@ -127,6 +130,8 @@ def audit_manifest(plan: dict, commitment: dict, holdout: dict, manifest: dict) 
             issues.append("Exact shared record identifiers found in model-declared datasets")
         if cross_split:
             issues.append("Same identifier appears in multiple declared dataset splits")
+        if cross_dataset:
+            issues.append("Same identifier appears in multiple declared datasets")
         if empty:
             issues.append("No record identifiers were supplied for this model")
         if not complete:
@@ -143,6 +148,8 @@ def audit_manifest(plan: dict, commitment: dict, holdout: dict, manifest: dict) 
             "matched_record_digests_truncated": len(match_hashes) > MAX_MATCHES_REPORTED,
             "cross_split_identifier_count": len(cross_split),
             "cross_split_digests_sample": cross_split[:MAX_MATCHES_REPORTED],
+            "cross_dataset_identifier_count": len(cross_dataset),
+            "cross_dataset_digests_sample": cross_dataset[:MAX_MATCHES_REPORTED],
             "issues": issues,
             "actual_model_training_corpus_verified": False,
         })
