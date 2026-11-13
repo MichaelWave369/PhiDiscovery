@@ -116,6 +116,13 @@ def main(argv: list[str] | None = None) -> int:
     cmd_mf.add_argument("holdout", type=Path, help="R0.6 repeated-trial holdout")
     cmd_mf.add_argument("manifest", type=Path, help="R0.7 model dataset ID manifest")
     cmd_mf.add_argument("--out", type=Path, required=True, help="New private report outside Git")
+    cmd_cf = commands.add_parser("content-audit", help="Compare provided text content across holdout and model manifests (offline)")
+    cmd_cf.add_argument("input", type=Path, help="Unchanged R0.5 prediction plan")
+    cmd_cf.add_argument("commitment", type=Path)
+    cmd_cf.add_argument("holdout", type=Path, help="R0.6 repeated-trial holdout")
+    cmd_cf.add_argument("manifest", type=Path, help="R0.7 model dataset manifest")
+    cmd_cf.add_argument("content_index", type=Path, help="R0.8 content index with supplied text records")
+    cmd_cf.add_argument("--out", type=Path, required=True, help="New private report outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -154,6 +161,18 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "content-audit":
+            from .content_audit import audit_content
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            report = audit_content(_json(args.input), _json(args.commitment),
+                                   _json(args.holdout), _json(args.manifest),
+                                   _json(args.content_index))
+            save_private_receipt(report, args.out)
+            print(f"Saved content audit: {report['status']} "
+                  f"(ranking suppressed={report['ranking_suppressed']}; "
+                  "raw model training data unauthenticated)")
             return 0
         if args.command == "manifest-audit":
             from .manifest_audit import audit_manifest
