@@ -171,16 +171,17 @@ def main(argv: list[str] | None = None) -> int:
                 print(result_text)
             return 0
         if args.command in ("anchor-draft", "anchor-verify"):
-            from .provenance import draft_publisher_claim, verify_anchor
+            from .provenance import draft_publisher_claim, verify_anchor, load_strict_json
             from .reviewers import save_private_receipt, validate_private_path
             validate_private_path(args.out)
-            artifact = _json(args.artifact)
+            artifact = load_strict_json(args.artifact)
             if args.command == "anchor-draft":
                 claim = draft_publisher_claim(artifact)
                 save_private_receipt(claim, args.out)
                 print(f"Prepared UNSIGNED publisher claim for {claim['artifact_sha256']}; no timestamp verified")
                 return 0
-            receipt = verify_anchor(artifact, _json(args.anchor), _json(args.trust_policy))
+            receipt = verify_anchor(artifact, load_strict_json(args.anchor),
+                                    load_strict_json(args.trust_policy))
             save_private_receipt(receipt, args.out)
             print("Verified two Ed25519 signatures against pinned keys; "
                   "witness identity and chronology remain UNVERIFIED")
