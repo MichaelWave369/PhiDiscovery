@@ -240,3 +240,11 @@ python -m phidiscovery quantum-brain --out out/brain
 ~~~
 
 Open `out/brain/quantum-brain.html` and read [the Quantum Brain Lab guide](docs/QUANTUM_BRAIN_LAB.md) for equations, limitations, and the experimental roadmap.
+
+
+## Checkpoint Archaeology Lab R0.1 (controlled forensic experiments)
+
+An experimental, offline-first checkpoint initialization research module now offers **synthetic** seed/layout recovery with disjoint holdouts and negative controls, plus optional **real local PyTorch** tensor capture/replay on your CPU or CUDA GPU. It does **not** identify training hardware for published models, reproduce NVIDIA Philox/cuRAND layouts, establish model lineage, or imply legal violations. See [Checkpoint Forensics R0.1](docs/CHECKPOINT_FORENSICS_R01.md) for methodology, commands, safeguards and the calibration roadmap.
+
+    python -m phidiscovery.checkpoint_lab synthetic --seed 953049583 --lanes 148 --out out/checkpoint-synthetic.json
+
