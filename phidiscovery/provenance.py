@@ -10,6 +10,8 @@ import base64
 import binascii
 from datetime import datetime, timezone
 import hashlib
+import json
+from pathlib import Path
 import re
 
 from .engine import InputError, sha256, stable_bytes
@@ -30,6 +32,33 @@ ARTIFACT_SCHEMAS = frozenset({
 })
 SHA_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 UTC_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+
+
+def load_strict_json(path: Path) -> dict:
+    """Reject ambiguous duplicate keys and nonstandard numbers in signed data."""
+    path = Path(path)
+    if path.stat().st_size > 20 * 1024 * 1024:
+        raise InputError("Signed provenance input exceeds 20 MiB cap")
+
+    def unique_pairs(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise InputError(f"Duplicate JSON key forbidden for signed provenance: {key}")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise InputError(f"Nonstandard numeric constant forbidden: {value}")
+
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"),
+                           object_pairs_hook=unique_pairs, parse_constant=reject_constant)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise InputError("Signed provenance input is not valid strict UTF-8 JSON") from exc
+    if type(value) is not dict:
+        raise InputError("Signed provenance requires a top-level JSON object")
+    return value
 
 
 def _digest(value: object, name: str) -> str:
