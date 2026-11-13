@@ -105,3 +105,11 @@ jobs:
           python examples/demo_log_consistency_r11.py --out-dir "$TEMP_DIR"
           python -m phidiscovery log-consistency "$TEMP_DIR/demo-r11-older.json" "$TEMP_DIR/demo-r11-newer.json" "$TEMP_DIR/demo-r11-proof.json" "$TEMP_DIR/demo-r11-log-trust.json" --out "$TEMP_DIR/report.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['signed_checkpoints_valid'] and r['merkle_consistency_valid'] and r['tree_growth_proven']; assert not r['older_checkpoint_independently_retained_verified'] and not r['external_time_verified'] and not r['cross_client_non_equivocation_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/report.json"
+
+
+      - name: R0.2 check offline synthetic cross-machine calibration and negative controls
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery.checkpoint_calibration demo --out "$TEMP_DIR/calibration-demo.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); s=r['same_simulated_layout']; d=r['different_simulated_layout']; assert s['descriptive_summary']['all_cross_machine_values_bit_identical']; assert not d['descriptive_summary']['all_cross_machine_values_bit_identical']; assert not s['hardware_identity_verified'] and not d['actual_training_hardware_verified']; assert s['evidence_class']=='SYNTHETIC_DEMO_ONLY'" "$TEMP_DIR/calibration-demo.json"
+          python -m unittest discover -s tests -p 'test_checkpoint_calibration.py' -v
