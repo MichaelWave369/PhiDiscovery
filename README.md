@@ -136,6 +136,16 @@ The proof only establishes mathematical consistency between supplied signed root
 python -m unittest tests.test_consistency -v
 ```
 
+## Second Map R1.2: signed cross-observer checkpoint gossip
+
+The new offline `gossip-audit` command checks signed checkpoint receipts from **two or more separately pinned observer keys** against the same log key. If a log signed **different roots for the same tree size**, the audit flags the conflict. Different-sized roots remain **unresolved** without a valid R1.1 consistency proof; a verified proof establishes only compatibility between those supplied signed roots.
+
+**No real observer identity, independent key custody, honest clock, or global absence of log equivocation is established.** Fictional `conflict`, `unresolved` and `consistent` demos use ephemeral test keys. See [R1.2 Cross-Observer Gossip](docs/SECOND_MAP_GOSSIP_R12.md) for the commands, contracts, and caveats.
+
+```bash
+python -m unittest tests.test_gossip -v
+```
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
