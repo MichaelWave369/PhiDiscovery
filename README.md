@@ -75,6 +75,16 @@ python -m unittest tests.test_predictions -v
 
 The included pendulum plan/holdout is **entirely fictional**. A local digest is **not an independently timestamped preregistration**, and user-supplied observations are not automatically authenticated. See [Second Map Prediction Holdout R0.5](docs/SECOND_MAP_PREDICTIONS_R05.md) for a complete private-output PowerShell workflow and limitations.
 
+## Second Map R0.6: repeated measurements and declared leakage review
+
+Use an unchanged R0.5 preregistered prediction plan with a new R0.6 holdout containing 2–30 individually identified trials per target, declared uncertainty for each trial, and a required model-exposure/blinding review. `replicate-score` reports target-weighted errors, trial variability, and conservative diagnostic uncertainty margins. Rankings are suppressed when a declared leakage/chronology risk is present.
+
+```bash
+python -m unittest tests.test_replicates -v
+```
+
+**No experiment or independent provenance audit is performed**: leakage checks are operator declarations; clean flags cannot certify clean data. The example is intentionally fictional. See [Second Map R0.6](docs/SECOND_MAP_REPLICATES_R06.md) for the complete offline private-file workflow and limits.
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:

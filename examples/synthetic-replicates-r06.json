@@ -1,0 +1,61 @@
+{
+  "schema_version": "0.6",
+  "study_id": "toy-pendulum-holdout-r05",
+  "holdout_id": "fictional-pendulum-a1",
+  "source": {
+    "type": "synthetic",
+    "locator": "demo:fictional-repeated-pendulum-r06",
+    "independence_group": "synthetic-fixture-not-independent"
+  },
+  "protocol": {
+    "predictions_frozen_before_collection": true,
+    "holdout_blinded_until_commitment": true,
+    "notes": "Fictional teaching example only: these declarations are authored metadata, not authenticated timestamps, actual masking or physical experiments."
+  },
+  "model_exposure": [
+    {
+      "model_id": "constant",
+      "prior_outcome_access": "no_access_declared",
+      "training_overlap": "none_declared",
+      "notes": "Synthetic teaching scenario. Not a verified model-data audit."
+    },
+    {
+      "model_id": "nonlinear",
+      "prior_outcome_access": "no_access_declared",
+      "training_overlap": "none_declared",
+      "notes": "Synthetic teaching scenario. Not a verified model-data audit."
+    }
+  ],
+  "observations": [
+    {
+      "target_id": "theta-05",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "replicates": [
+        {"id": "toy05-a", "value": 2.002, "reported_uncertainty": 0.01},
+        {"id": "toy05-b", "value": 2.008, "reported_uncertainty": 0.01},
+        {"id": "toy05-c", "value": 2.005, "reported_uncertainty": 0.01}
+      ]
+    },
+    {
+      "target_id": "theta-40",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "replicates": [
+        {"id": "toy40-a", "value": 2.073, "reported_uncertainty": 0.01},
+        {"id": "toy40-b", "value": 2.077, "reported_uncertainty": 0.01},
+        {"id": "toy40-c", "value": 2.075, "reported_uncertainty": 0.01}
+      ]
+    },
+    {
+      "target_id": "theta-70",
+      "quantity": "pendulum_period",
+      "unit": "s",
+      "replicates": [
+        {"id": "toy70-a", "value": 2.242, "reported_uncertainty": 0.01},
+        {"id": "toy70-b", "value": 2.246, "reported_uncertainty": 0.01},
+        {"id": "toy70-c", "value": 2.244, "reported_uncertainty": 0.01}
+      ]
+    }
+  ]
+}
