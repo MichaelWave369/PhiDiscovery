@@ -65,7 +65,7 @@ def signed_fixture(old_size=3, new_size=7, tampered_history=False):
     old = leaves(old_size)
     newer_leaves = leaves(new_size)
     if tampered_history:
-        newer_leaves[0] = hashlib.sha256(b"\\x00rewritten-first-record").digest()
+        newer_leaves[0] = hashlib.sha256(b"\x00rewritten-first-record").digest()
     old_root, new_root = root(old), root(newer_leaves)
     old_cp = {
         "schema": CHECKPOINT_SCHEMA,
