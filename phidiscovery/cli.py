@@ -138,6 +138,12 @@ def main(argv: list[str] | None = None) -> int:
     cmd_lv.add_argument("proof", type=Path, help="R1.0 signed checkpoint and audit path")
     cmd_lv.add_argument("log_trust", type=Path, help="Separately obtained pinned log public key")
     cmd_lv.add_argument("--out", type=Path, required=True, help="New private verification report outside Git")
+    cmd_lc = commands.add_parser("log-consistency", help="Verify two signed log roots preserve append-only history (offline)")
+    cmd_lc.add_argument("older", type=Path, help="Independently retained older signed checkpoint envelope")
+    cmd_lc.add_argument("newer", type=Path, help="Newer signed checkpoint envelope")
+    cmd_lc.add_argument("proof", type=Path, help="Merkle consistency proof for the two roots")
+    cmd_lc.add_argument("log_trust", type=Path, help="Pinned R1.0 log public key and tree-size floor")
+    cmd_lc.add_argument("--out", type=Path, required=True, help="New private report outside Git checkout")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -176,6 +182,22 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command == "log-consistency":
+            from .consistency import verify_consistency
+            from .provenance import load_strict_json
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            report = verify_consistency(
+                load_strict_json(args.older),
+                load_strict_json(args.newer),
+                load_strict_json(args.proof),
+                load_strict_json(args.log_trust),
+            )
+            save_private_receipt(report, args.out)
+            print(f"PASS: verified signed Merkle consistency "
+                  f"{report['older_tree_size']} -> {report['newer_tree_size']}; "
+                  "timestamps, identity and global non-equivocation NOT attested")
             return 0
         if args.command == "log-verify":
             from .transparency import verify_log_inclusion

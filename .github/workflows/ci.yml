@@ -98,3 +98,10 @@ jobs:
           python examples/demo_log_inclusion_r10.py "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" --out-dir "$TEMP_DIR"
           python -m phidiscovery log-verify "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" "$TEMP_DIR/demo-log-proof.json" "$TEMP_DIR/demo-log-trust.json" --out "$TEMP_DIR/verification.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['merkle_inclusion_valid'] and r['log_checkpoint_signature_valid'] and r['publisher_witness_signatures_valid']; assert not r['external_time_source_verified'] and not r['append_only_consistency_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/verification.json"
+
+      - name: Verify synthetic signed Merkle consistency between two checkpoints
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python examples/demo_log_consistency_r11.py --out-dir "$TEMP_DIR"
+          python -m phidiscovery log-consistency "$TEMP_DIR/demo-r11-older.json" "$TEMP_DIR/demo-r11-newer.json" "$TEMP_DIR/demo-r11-proof.json" "$TEMP_DIR/demo-r11-log-trust.json" --out "$TEMP_DIR/report.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['signed_checkpoints_valid'] and r['merkle_consistency_valid'] and r['tree_growth_proven']; assert not r['older_checkpoint_independently_retained_verified'] and not r['external_time_verified'] and not r['cross_client_non_equivocation_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/report.json"
