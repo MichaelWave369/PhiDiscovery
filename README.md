@@ -95,6 +95,16 @@ python -m unittest tests.test_manifest_audit -v
 
 This is an **offline record-identifier audit**, not an inspection of private model weights or full pretraining corpora. The deliberate overlap in the synthetic example only tests the software. A no-match result never verifies clean training data. See [Second Map Manifest Audit R0.7](docs/SECOND_MAP_MANIFEST_AUDIT_R07.md).
 
+## Second Map R0.8: content overlap beyond renamed record identifiers
+
+The offline `content-audit` command compares **operator-provided source excerpts** from held-out trials and declared training/evaluation data using exact and whitespace-normalized text fingerprints. Renamed record IDs can no longer conceal an *identical supplied text excerpt*. Incomplete, overlapping, or suspicious records quarantine descriptive rankings while retaining R0.7/R0.6 diagnostics.
+
+**No actual training corpus or timestamp is authenticated.** The synthetic example deliberately plants a renamed text match, and whitespace candidates are weaker than exact matches. Full docs: [Second Map Content Audit R0.8](docs/SECOND_MAP_CONTENT_AUDIT_R08.md).
+
+```bash
+python -m unittest tests.test_content_audit -v
+```
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
