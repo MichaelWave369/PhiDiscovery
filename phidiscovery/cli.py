@@ -123,6 +123,14 @@ def main(argv: list[str] | None = None) -> int:
     cmd_cf.add_argument("manifest", type=Path, help="R0.7 model dataset manifest")
     cmd_cf.add_argument("content_index", type=Path, help="R0.8 content index with supplied text records")
     cmd_cf.add_argument("--out", type=Path, required=True, help="New private report outside Git")
+    cmd_ad = commands.add_parser("anchor-draft", help="Prepare unsigned publisher claim for external signing (offline)")
+    cmd_ad.add_argument("artifact", type=Path, help="PhiDiscovery research receipt JSON")
+    cmd_ad.add_argument("--out", type=Path, required=True, help="New private claim JSON outside Git")
+    cmd_av = commands.add_parser("anchor-verify", help="Verify distinct pinned Ed25519 publisher/witness signatures (offline)")
+    cmd_av.add_argument("artifact", type=Path)
+    cmd_av.add_argument("anchor", type=Path, help="Externally signed publisher and witness claims")
+    cmd_av.add_argument("trust_policy", type=Path, help="Operator-pinned public keys distributed out of band")
+    cmd_av.add_argument("--out", type=Path, required=True, help="New private verification receipt outside Git")
     args = parser.parse_args(argv)
     try:
         if args.command == "quantum-brain":
@@ -161,6 +169,21 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"Saved {args.out}")
             else:
                 print(result_text)
+            return 0
+        if args.command in ("anchor-draft", "anchor-verify"):
+            from .provenance import draft_publisher_claim, verify_anchor
+            from .reviewers import save_private_receipt, validate_private_path
+            validate_private_path(args.out)
+            artifact = _json(args.artifact)
+            if args.command == "anchor-draft":
+                claim = draft_publisher_claim(artifact)
+                save_private_receipt(claim, args.out)
+                print(f"Prepared UNSIGNED publisher claim for {claim['artifact_sha256']}; no timestamp verified")
+                return 0
+            receipt = verify_anchor(artifact, _json(args.anchor), _json(args.trust_policy))
+            save_private_receipt(receipt, args.out)
+            print("Verified two Ed25519 signatures against pinned keys; "
+                  "witness identity and chronology remain UNVERIFIED")
             return 0
         if args.command == "content-audit":
             from .content_audit import audit_content
