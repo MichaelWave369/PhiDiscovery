@@ -85,6 +85,16 @@ python -m unittest tests.test_replicates -v
 
 **No experiment or independent provenance audit is performed**: leakage checks are operator declarations; clean flags cannot certify clean data. The example is intentionally fictional. See [Second Map R0.6](docs/SECOND_MAP_REPLICATES_R06.md) for the complete offline private-file workflow and limits.
 
+## Second Map R0.7: training/evaluation manifest overlap audit
+
+`manifest-audit` cross-references the **exact canonical trial IDs** from an R0.6 held-out measurement file against operator-supplied model dataset manifests. Shared identifiers, incomplete inventories and cross-split duplicates trigger explicit leakage flags and quarantine the descriptive model leader; raw prediction error diagnostics remain available.
+
+```bash
+python -m unittest tests.test_manifest_audit -v
+```
+
+This is an **offline record-identifier audit**, not an inspection of private model weights or full pretraining corpora. The deliberate overlap in the synthetic example only tests the software. A no-match result never verifies clean training data. See [Second Map Manifest Audit R0.7](docs/SECOND_MAP_MANIFEST_AUDIT_R07.md).
+
 ## Quick start
 
 Requires **Python 3.10+**. No third-party dependencies for core analysis. From the repository directory:
