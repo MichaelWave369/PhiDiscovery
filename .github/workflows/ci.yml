@@ -89,3 +89,12 @@ jobs:
           python examples/demo_signed_anchor_r09.py "$TEMP_DIR/lock.json" --out-dir "$TEMP_DIR"
           python -m phidiscovery anchor-verify "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" --out "$TEMP_DIR/verification.json"
           python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['publisher_ed25519_signature_valid'] and r['witness_ed25519_signature_valid'] and not r['independent_timestamp_authority_verified'] and not r['witness_actual_time_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/verification.json"
+
+      - name: Verify synthetic signed Merkle log inclusion without trusting the timestamp
+        run: |
+          TEMP_DIR="$(mktemp -d)"
+          python -m phidiscovery predict-register examples/prediction-plan-r05.json --out "$TEMP_DIR/lock.json"
+          python examples/demo_signed_anchor_r09.py "$TEMP_DIR/lock.json" --out-dir "$TEMP_DIR"
+          python examples/demo_log_inclusion_r10.py "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" --out-dir "$TEMP_DIR"
+          python -m phidiscovery log-verify "$TEMP_DIR/lock.json" "$TEMP_DIR/demo-anchor.json" "$TEMP_DIR/demo-trust.json" "$TEMP_DIR/demo-log-proof.json" "$TEMP_DIR/demo-log-trust.json" --out "$TEMP_DIR/verification.json"
+          python -c "import json,sys; r=json.load(open(sys.argv[1])); assert r['merkle_inclusion_valid'] and r['log_checkpoint_signature_valid'] and r['publisher_witness_signatures_valid']; assert not r['external_time_source_verified'] and not r['append_only_consistency_verified'] and not r['hypothesis_validated']" "$TEMP_DIR/verification.json"
